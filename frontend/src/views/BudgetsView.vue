@@ -1,0 +1,350 @@
+<template>
+  <div class="space-y-6">
+    <!-- Nadpis a tlačítko pro přidání -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Rozpočty</h1>
+        <p class="text-gray-600">Spravujte své měsíční rozpočty podle kategorií</p>
+      </div>
+      <button
+        @click="showAddModal = true"
+        class="btn-primary flex items-center space-x-2"
+      >
+        <Plus class="w-5 h-5" />
+        <span>Přidat rozpočet</span>
+      </button>
+    </div>
+
+    <!-- Celkový přehled rozpočtu -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Celkový rozpočet</p>
+            <p class="text-2xl font-bold text-blue-600">{{ formatCurrency(totalBudget) }}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <PiggyBank class="w-6 h-6 text-blue-600" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Utraceno</p>
+            <p class="text-2xl font-bold text-red-600">{{ formatCurrency(totalSpent) }}</p>
+          </div>
+          <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+            <TrendingDown class="w-6 h-6 text-red-600" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Zbývá</p>
+            <p 
+              class="text-2xl font-bold"
+              :class="totalRemaining >= 0 ? 'text-green-600' : 'text-red-600'"
+            >
+              {{ formatCurrency(totalRemaining) }}
+            </p>
+          </div>
+          <div 
+            class="w-12 h-12 rounded-lg flex items-center justify-center"
+            :class="totalRemaining >= 0 ? 'bg-green-100' : 'bg-red-100'"
+          >
+            <Wallet 
+              class="w-6 h-6" 
+              :class="totalRemaining >= 0 ? 'text-green-600' : 'text-red-600'"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Aktivní rozpočty</p>
+            <p class="text-2xl font-bold text-purple-600">{{ financeStore.activeBudgets.length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <BarChart3 class="w-6 h-6 text-purple-600" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Celkový pokrok -->
+    <div class="card">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Celkový pokrok rozpočtu</h3>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-700">Využití rozpočtu</span>
+          <span class="text-sm text-gray-500">
+            {{ totalBudget > 0 ? Math.round((totalSpent / totalBudget) * 100) : 0 }}%
+          </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-3">
+          <div
+            class="h-3 rounded-full transition-all duration-300"
+            :class="getBudgetProgressClass(totalSpent, totalBudget)"
+            :style="{ width: `${Math.min((totalSpent / totalBudget) * 100, 100)}%` }"
+          ></div>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-gray-600">{{ formatCurrency(totalSpent) }}</span>
+          <span class="font-medium text-gray-900">{{ formatCurrency(totalBudget) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading stav -->
+    <div v-if="financeStore.isBudgetsLoading" class="flex items-center justify-center py-12">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Prázdný stav -->
+    <div v-else-if="financeStore.budgets.length === 0" class="card text-center py-12">
+      <PiggyBank class="w-16 h-16 mx-auto mb-4 text-gray-300" />
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Žádné rozpočty</h3>
+      <p class="text-gray-500 mb-4">Vytvořte své první rozpočty a začněte spravovat výdaje!</p>
+      <button
+        @click="showAddModal = true"
+        class="btn-primary"
+      >
+        Vytvořit první rozpočet
+      </button>
+    </div>
+
+    <!-- Seznam rozpočtů -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div
+        v-for="budget in financeStore.budgets"
+        :key="budget.id"
+        class="card hover:shadow-md transition-shadow"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h3 class="font-semibold text-gray-900">{{ getCategoryName(budget.category_id) }}</h3>
+            <p class="text-sm text-gray-500">{{ getMonthName(budget.month) }} {{ budget.year }}</p>
+          </div>
+          <div class="flex items-center space-x-1">
+            <div
+              class="px-2 py-1 rounded-full text-xs font-medium"
+              :class="budget.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'"
+            >
+              {{ budget.is_active ? 'Aktivní' : 'Neaktivní' }}
+            </div>
+            <button
+              @click="editBudget(budget)"
+              class="p-1 text-gray-400 hover:text-blue-600 rounded"
+            >
+              <Edit2 class="w-4 h-4" />
+            </button>
+            <button
+              @click="deleteBudget(budget)"
+              class="p-1 text-gray-400 hover:text-red-600 rounded"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Pokrok rozpočtu -->
+        <div class="mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium text-gray-700">Pokrok</span>
+            <span class="text-sm text-gray-500">
+              {{ Math.round((getBudgetSpent(budget) / budget.amount) * 100) }}%
+            </span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div
+              class="h-2 rounded-full transition-all duration-300"
+              :class="getBudgetProgressClass(getBudgetSpent(budget), budget.amount)"
+              :style="{ width: `${Math.min((getBudgetSpent(budget) / budget.amount) * 100, 100)}%` }"
+            ></div>
+          </div>
+          <div class="flex items-center justify-between mt-2 text-sm">
+            <span class="text-gray-600">{{ formatCurrency(getBudgetSpent(budget)) }}</span>
+            <span class="font-medium text-gray-900">{{ formatCurrency(budget.amount) }}</span>
+          </div>
+        </div>
+
+        <!-- Zbývající částka -->
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Zbývá:</span>
+          <span 
+            class="text-sm font-medium"
+            :class="getBudgetRemaining(budget) >= 0 ? 'text-green-600' : 'text-red-600'"
+          >
+            {{ formatCurrency(getBudgetRemaining(budget)) }}
+          </span>
+        </div>
+
+        <!-- Varování při překročení -->
+        <div 
+          v-if="getBudgetSpent(budget) > budget.amount" 
+          class="mt-3 bg-red-50 border border-red-200 rounded-lg p-3"
+        >
+          <div class="flex items-center">
+            <AlertTriangle class="w-4 h-4 text-red-500 mr-2" />
+            <span class="text-sm text-red-700 font-medium">Rozpočet překročen!</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modály -->
+    <AddBudgetModal
+      v-if="showAddModal"
+      @close="showAddModal = false"
+      @budget-added="handleBudgetAdded"
+    />
+
+    <EditBudgetModal
+      v-if="showEditModal && selectedBudget"
+      :budget="selectedBudget"
+      @close="closeEditModal"
+      @budget-updated="handleBudgetUpdated"
+    />
+
+    <DeleteConfirmModal
+      v-if="showDeleteModal && selectedBudget"
+      :title="`Smazat rozpočet pro &quot;${getCategoryName(selectedBudget.category_id)}&quot;?`"
+      :message="'Tato akce je nevratná. Rozpočet bude trvale odstraněn.'"
+      @close="closeDeleteModal"
+      @confirm="handleDeleteConfirm"
+    />
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useFinanceStore } from '@/stores/finance'
+import {
+  Plus,
+  PiggyBank,
+  TrendingDown,
+  Wallet,
+  BarChart3,
+  Edit2,
+  Trash2,
+  AlertTriangle
+} from 'lucide-vue-next'
+import AddBudgetModal from '@/components/AddBudgetModal.vue'
+import EditBudgetModal from '@/components/EditBudgetModal.vue'
+import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+
+const financeStore = useFinanceStore()
+
+const showAddModal = ref(false)
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+const selectedBudget = ref(null)
+
+const totalBudget = computed(() => {
+  return financeStore.activeBudgets.reduce((sum, budget) => sum + budget.amount, 0)
+})
+
+const totalSpent = computed(() => {
+  return financeStore.activeBudgets.reduce((sum, budget) => sum + getBudgetSpent(budget), 0)
+})
+
+const totalRemaining = computed(() => {
+  return totalBudget.value - totalSpent.value
+})
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency: 'CZK'
+  }).format(amount || 0)
+}
+
+const getCategoryName = (categoryId) => {
+  const category = financeStore.categories.find(c => c.id === categoryId)
+  return category ? category.name : 'Neznámá kategorie'
+}
+
+const getMonthName = (month) => {
+  const months = [
+    'Leden', 'Únor', 'Březen', 'Duben', 'Květen', 'Červen',
+    'Červenec', 'Srpen', 'Září', 'Říjen', 'Listopad', 'Prosinec'
+  ]
+  return months[month - 1] || 'Neznámý měsíc'
+}
+
+const getBudgetSpent = (budget) => {
+  // Spočítej výdaje pro danou kategorii v daném měsíci
+  const currentMonth = new Date().getMonth() + 1
+  const currentYear = new Date().getFullYear()
+  
+  // Pro jednoduchost používáme aktuální měsíc - v reálné aplikaci by se filtrovalo podle budget.month a budget.year
+  return financeStore.transactions
+    .filter(t => 
+      t.type === 'expense' && 
+      t.category_id === budget.category_id &&
+      new Date(t.date).getMonth() + 1 === currentMonth &&
+      new Date(t.date).getFullYear() === currentYear
+    )
+    .reduce((sum, t) => sum + t.amount, 0)
+}
+
+const getBudgetRemaining = (budget) => {
+  return budget.amount - getBudgetSpent(budget)
+}
+
+const getBudgetProgressClass = (spent, budget) => {
+  const percentage = (spent / budget) * 100
+  if (percentage >= 100) {
+    return 'bg-red-500'
+  } else if (percentage >= 80) {
+    return 'bg-yellow-500'
+  } else {
+    return 'bg-green-500'
+  }
+}
+
+const editBudget = (budget) => {
+  selectedBudget.value = budget
+  showEditModal.value = true
+}
+
+const deleteBudget = (budget) => {
+  selectedBudget.value = budget
+  showDeleteModal.value = true
+}
+
+const closeEditModal = () => {
+  showEditModal.value = false
+  selectedBudget.value = null
+}
+
+const closeDeleteModal = () => {
+  showDeleteModal.value = false
+  selectedBudget.value = null
+}
+
+const handleBudgetAdded = () => {
+  showAddModal.value = false
+}
+
+const handleBudgetUpdated = () => {
+  closeEditModal()
+}
+
+const handleDeleteConfirm = async () => {
+  if (selectedBudget.value) {
+    await financeStore.deleteBudget(selectedBudget.value.id)
+    closeDeleteModal()
+  }
+}
+
+onMounted(() => {
+  // Data se načtou automaticky v Layout komponentě
+})
+</script>
