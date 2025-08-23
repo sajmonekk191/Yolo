@@ -88,10 +88,15 @@
       <div class="lg:pl-64 flex-1">
         <!-- Mobilní header -->
         <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-          <div class="px-3 sm:px-4 py-3 flex items-center justify-between">
-            <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Yolo Finance
-            </h1>
+          <div class="px-3 sm:px-4 py-2 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <TrendingUp class="w-5 h-5 text-white" />
+              </div>
+              <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Yolo Finance
+              </h1>
+            </div>
             <button @click="logout" class="p-2 -mr-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
               <LogOut class="w-5 h-5 text-gray-600" />
             </button>
