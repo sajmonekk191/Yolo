@@ -29,9 +29,9 @@ try:
     
     # Create sample income transactions
     incomes = [
-        {"description": "Výplata", "amount": 45000, "date": datetime.now() - timedelta(days=5)},
-        {"description": "Freelance projekt", "amount": 25000, "date": datetime.now() - timedelta(days=10)},
-        {"description": "Investiční výnos", "amount": 3500, "date": datetime.now() - timedelta(days=15)},
+        {"description": "Výplata", "amount": 45000, "category_id": 1, "date": datetime.now() - timedelta(days=5)},
+        {"description": "Freelance projekt", "amount": 25000, "category_id": 2, "date": datetime.now() - timedelta(days=10)},
+        {"description": "Investiční výnos", "amount": 3500, "category_id": 3, "date": datetime.now() - timedelta(days=15)},
     ]
     
     for income_data in incomes:
@@ -40,18 +40,19 @@ try:
             type=TransactionType.INCOME,
             amount=income_data["amount"],
             description=income_data["description"],
+            category_id=income_data["category_id"],
             date=income_data["date"]
         )
         db.add(transaction)
     
     # Create sample expense transactions
     expenses = [
-        {"description": "Nájem", "amount": 15000, "category": ExpenseCategory.HOUSING},
-        {"description": "Nákup potravin", "amount": 3500, "category": ExpenseCategory.FOOD},
-        {"description": "Benzín", "amount": 2000, "category": ExpenseCategory.TRANSPORT},
-        {"description": "Elektřina", "amount": 1800, "category": ExpenseCategory.UTILITIES},
-        {"description": "Netflix", "amount": 300, "category": ExpenseCategory.ENTERTAINMENT},
-        {"description": "Oběd v restauraci", "amount": 450, "category": ExpenseCategory.FOOD},
+        {"description": "Nájem", "amount": 15000, "category_id": 7},  # Bydlení
+        {"description": "Nákup potravin", "amount": 3500, "category_id": 6},  # Jídlo
+        {"description": "Benzín", "amount": 2000, "category_id": 8},  # Doprava
+        {"description": "Elektřina", "amount": 1800, "category_id": 18},  # Energie
+        {"description": "Netflix", "amount": 300, "category_id": 19},  # Předplatné
+        {"description": "Oběd v restauraci", "amount": 450, "category_id": 12},  # Restaurace
     ]
     
     for expense_data in expenses:
@@ -60,7 +61,7 @@ try:
             type=TransactionType.EXPENSE,
             amount=expense_data["amount"],
             description=expense_data["description"],
-            category=expense_data["category"],
+            category_id=expense_data["category_id"],
             date=datetime.now() - timedelta(days=random.randint(1, 20))
         )
         db.add(transaction)
@@ -88,20 +89,21 @@ try:
     current_year = datetime.now().year
     
     budgets = [
-        {"category": ExpenseCategory.FOOD, "monthly_limit": 8000, "current_spent": 3950},
-        {"category": ExpenseCategory.TRANSPORT, "monthly_limit": 3000, "current_spent": 2000},
-        {"category": ExpenseCategory.ENTERTAINMENT, "monthly_limit": 2000, "current_spent": 300},
-        {"category": ExpenseCategory.UTILITIES, "monthly_limit": 3000, "current_spent": 1800},
+        {"category_id": 6, "amount": 8000, "spent": 3950},  # Jídlo
+        {"category_id": 8, "amount": 3000, "spent": 2000},  # Doprava
+        {"category_id": 11, "amount": 2000, "spent": 300},  # Zábava
+        {"category_id": 18, "amount": 3000, "spent": 1800},  # Energie
     ]
     
     for budget_data in budgets:
         budget = Budget(
             user_id=demo_user.id,
-            category=budget_data["category"],
-            monthly_limit=budget_data["monthly_limit"],
-            current_spent=budget_data["current_spent"],
+            category_id=budget_data["category_id"],
+            amount=budget_data["amount"],
+            spent=budget_data["spent"],
             month=current_month,
-            year=current_year
+            year=current_year,
+            is_active=True
         )
         db.add(budget)
     

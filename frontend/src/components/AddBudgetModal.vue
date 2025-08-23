@@ -23,7 +23,7 @@
               required
               class="form-input"
             >
-              <option value="">Vyberte kategorii</option>
+              <option value="">✓ Vyberte kategorii</option>
               <option
                 v-for="category in financeStore.expenseCategories"
                 :key="category.id"

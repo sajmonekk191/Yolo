@@ -18,14 +18,15 @@ async def create_budget(
     # Check if budget exists for this category and month
     existing_budget = db.query(models.Budget).filter(
         models.Budget.user_id == current_user.id,
-        models.Budget.category == budget.category,
+        models.Budget.category_id == budget.category_id,
         models.Budget.month == budget.month,
         models.Budget.year == budget.year
     ).first()
     
     if existing_budget:
         # Update existing budget
-        existing_budget.monthly_limit = budget.monthly_limit
+        existing_budget.amount = budget.amount
+        existing_budget.is_active = budget.is_active
         db.commit()
         db.refresh(existing_budget)
         return existing_budget

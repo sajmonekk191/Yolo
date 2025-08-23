@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from routers import auth, users, transactions, goals, budgets, dashboard
+from routers import auth, users, transactions, goals, budgets, dashboard, categories
 from database import engine, Base
 
 # Create database tables
@@ -29,6 +29,7 @@ app.include_router(transactions.router, prefix="/api/transactions", tags=["trans
 app.include_router(goals.router, prefix="/api/goals", tags=["goals"])
 app.include_router(budgets.router, prefix="/api/budgets", tags=["budgets"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+app.include_router(categories.router, prefix="/api/categories", tags=["categories"])
 
 @app.get("/")
 def read_root():

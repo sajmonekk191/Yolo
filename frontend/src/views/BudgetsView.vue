@@ -127,9 +127,18 @@
         class="card hover:shadow-md transition-shadow"
       >
         <div class="flex items-start justify-between mb-4">
-          <div>
-            <h3 class="font-semibold text-gray-900">{{ getCategoryName(budget.category_id) }}</h3>
-            <p class="text-sm text-gray-500">{{ getMonthName(budget.month) }} {{ budget.year }}</p>
+          <div class="flex items-start space-x-3">
+            <div class="flex-shrink-0 mt-1">
+              <CategoryIcon
+                v-if="getCategory(budget.category_id)"
+                :icon="getCategory(budget.category_id).icon"
+                :color="getCategory(budget.category_id).color"
+              />
+            </div>
+            <div>
+              <h3 class="font-semibold text-gray-900">{{ getCategoryName(budget.category_id) }}</h3>
+              <p class="text-sm text-gray-500">{{ getMonthName(budget.month) }} {{ budget.year }}</p>
+            </div>
           </div>
           <div class="flex items-center space-x-1">
             <div
@@ -238,6 +247,7 @@ import {
 import AddBudgetModal from '@/components/AddBudgetModal.vue'
 import EditBudgetModal from '@/components/EditBudgetModal.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import CategoryIcon from '@/components/CategoryIcon.vue'
 
 const financeStore = useFinanceStore()
 
@@ -268,6 +278,10 @@ const formatCurrency = (amount) => {
 const getCategoryName = (categoryId) => {
   const category = financeStore.categories.find(c => c.id === categoryId)
   return category ? category.name : 'Neznámá kategorie'
+}
+
+const getCategory = (categoryId) => {
+  return financeStore.categories.find(c => c.id === categoryId)
 }
 
 const getMonthName = (month) => {

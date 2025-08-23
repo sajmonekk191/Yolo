@@ -68,8 +68,8 @@ async def get_dashboard_stats(
     
     budget_utilization = 0
     if budgets:
-        total_limit = sum(b.monthly_limit for b in budgets)
-        total_spent = sum(b.current_spent for b in budgets)
+        total_limit = sum(b.amount for b in budgets)
+        total_spent = sum(b.spent for b in budgets)
         budget_utilization = (total_spent / total_limit * 100) if total_limit > 0 else 0
     
     return schemas.DashboardStats(

@@ -22,17 +22,17 @@ async def create_transaction(
     db.add(db_transaction)
     
     # Update budget if expense
-    if transaction.type == models.TransactionType.EXPENSE and transaction.category:
+    if transaction.type == models.TransactionType.EXPENSE and transaction.category_id:
         current_month = datetime.now().month
         current_year = datetime.now().year
         budget = db.query(models.Budget).filter(
             models.Budget.user_id == current_user.id,
-            models.Budget.category == transaction.category,
+            models.Budget.category_id == transaction.category_id,
             models.Budget.month == current_month,
             models.Budget.year == current_year
         ).first()
         if budget:
-            budget.current_spent += transaction.amount
+            budget.spent += transaction.amount
     
     db.commit()
     db.refresh(db_transaction)
@@ -43,7 +43,7 @@ async def read_transactions(
     skip: int = 0,
     limit: int = 100,
     type: Optional[models.TransactionType] = None,
-    category: Optional[models.ExpenseCategory] = None,
+    category_id: Optional[int] = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     current_user: models.User = Depends(auth.get_current_active_user),
@@ -53,8 +53,8 @@ async def read_transactions(
     
     if type:
         query = query.filter(models.Transaction.type == type)
-    if category:
-        query = query.filter(models.Transaction.category == category)
+    if category_id:
+        query = query.filter(models.Transaction.category_id == category_id)
     if start_date:
         query = query.filter(models.Transaction.date >= start_date)
     if end_date:

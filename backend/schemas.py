@@ -30,7 +30,7 @@ class TokenData(BaseModel):
 # Transaction schemas
 class TransactionBase(BaseModel):
     type: TransactionType
-    category: Optional[ExpenseCategory] = None
+    category_id: Optional[int] = None
     amount: float
     description: str
     date: Optional[datetime] = None
@@ -74,10 +74,11 @@ class Goal(GoalBase):
 
 # Budget schemas
 class BudgetBase(BaseModel):
-    category: ExpenseCategory
-    monthly_limit: float
+    category_id: int
+    amount: float
     month: int
     year: int
+    is_active: bool = True
 
 class BudgetCreate(BudgetBase):
     pass
@@ -85,7 +86,7 @@ class BudgetCreate(BudgetBase):
 class Budget(BudgetBase):
     id: int
     user_id: int
-    current_spent: float
+    spent: float = 0
     created_at: datetime
     
     class Config:
