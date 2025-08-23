@@ -1,43 +1,23 @@
 <template>
   <div class="min-h-mobile safe-top safe-bottom bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-    <!-- Mobilní navigace -->
-    <div v-if="isMobileMenuOpen" class="fixed inset-0 z-50 lg:hidden">
-      <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeMobileMenu"></div>
-      <div class="fixed top-0 left-0 h-full w-64 max-w-[80vw] bg-white shadow-xl safe-top safe-bottom">
-        <div class="flex items-center justify-between p-3 sm:p-4 border-b">
-          <h2 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Yolo Finance
-          </h2>
-          <button @click="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-        <nav class="p-3 sm:p-4 overflow-y-auto flex-1">
-          <div class="space-y-1 sm:space-y-2">
-            <router-link
-              v-for="item in navigation"
-              :key="item.name"
-              :to="item.to"
-              @click="closeMobileMenu"
-              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm sm:text-base text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-              :class="{ 'bg-blue-50 text-blue-700': $route.name === item.name }"
-            >
-              <component :is="item.icon" class="w-5 h-5" />
-              <span>{{ item.label }}</span>
-            </router-link>
-          </div>
-        </nav>
-        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t bg-white">
-          <button
-            @click="logout"
-            class="flex items-center space-x-3 w-full px-3 py-2.5 rounded-lg text-sm sm:text-base text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors"
-          >
-            <LogOut class="w-5 h-5" />
-            <span>Odhlásit se</span>
-          </button>
-        </div>
+    <!-- Bottom Navigation pro mobily -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-bottom z-50">
+      <div class="grid grid-cols-4 gap-1 px-2 py-1">
+        <router-link
+          v-for="item in navigation"
+          :key="item.name"
+          :to="item.to"
+          class="flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors"
+          :class="$route.name === item.name ? 'text-blue-600' : 'text-gray-500'"
+        >
+          <component 
+            :is="item.icon" 
+            class="w-5 h-5 mb-1"
+          />
+          <span class="text-xs font-medium">{{ item.label }}</span>
+        </router-link>
       </div>
-    </div>
+    </nav>
 
     <!-- Desktop layout -->
     <div class="flex">
@@ -109,19 +89,18 @@
         <!-- Mobilní header -->
         <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
           <div class="px-3 sm:px-4 py-3 flex items-center justify-between">
-            <button @click="openMobileMenu" class="p-2 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
-              <Menu class="w-5 h-5 sm:w-6 sm:h-6" />
-            </button>
             <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Yolo Finance
             </h1>
-            <div class="w-8"></div> <!-- Spacer pro vyvážení -->
+            <button @click="logout" class="p-2 -mr-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
+              <LogOut class="w-5 h-5 text-gray-600" />
+            </button>
           </div>
         </div>
 
         <!-- Obsah stránky -->
-        <main class="flex-1 min-h-[calc(100vh-60px)] lg:min-h-screen">
-          <div class="p-3 sm:p-4 lg:p-6 pb-safe">
+        <main class="flex-1">
+          <div class="p-3 sm:p-4 lg:p-6 pb-20 lg:pb-6">
             <router-view />
           </div>
         </main>
@@ -136,8 +115,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFinanceStore } from '@/stores/finance'
 import {
-  Menu,
-  X,
   Home,
   ArrowUpDown,
   Target,
@@ -150,7 +127,8 @@ const router = useRouter()
 const authStore = useAuthStore()
 const financeStore = useFinanceStore()
 
-const isMobileMenuOpen = ref(false)
+// Odstranění nepotřebné reference pro mobilní menu
+// const isMobileMenuOpen = ref(false)
 
 const navigation = [
   {
@@ -184,13 +162,14 @@ const userInitials = computed(() => {
   return name ? name.charAt(0).toUpperCase() : 'U'
 })
 
-const openMobileMenu = () => {
-  isMobileMenuOpen.value = true
-}
+// Funkce pro mobilní menu už nejsou potřeba
+// const openMobileMenu = () => {
+//   isMobileMenuOpen.value = true
+// }
 
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
+// const closeMobileMenu = () => {
+//   isMobileMenuOpen.value = false
+// }
 
 const logout = async () => {
   authStore.logout()
