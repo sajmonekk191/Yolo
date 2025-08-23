@@ -1,25 +1,25 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <div class="min-h-mobile safe-top safe-bottom bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
     <!-- Mobilní navigace -->
     <div v-if="isMobileMenuOpen" class="fixed inset-0 z-50 lg:hidden">
       <div class="fixed inset-0 bg-black bg-opacity-50" @click="closeMobileMenu"></div>
-      <div class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl">
-        <div class="flex items-center justify-between p-4 border-b">
-          <h2 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+      <div class="fixed top-0 left-0 h-full w-64 max-w-[80vw] bg-white shadow-xl safe-top safe-bottom">
+        <div class="flex items-center justify-between p-3 sm:p-4 border-b">
+          <h2 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Yolo Finance
           </h2>
-          <button @click="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100">
+          <button @click="closeMobileMenu" class="p-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
             <X class="w-5 h-5" />
           </button>
         </div>
-        <nav class="p-4">
-          <div class="space-y-2">
+        <nav class="p-3 sm:p-4 overflow-y-auto flex-1">
+          <div class="space-y-1 sm:space-y-2">
             <router-link
               v-for="item in navigation"
               :key="item.name"
               :to="item.to"
               @click="closeMobileMenu"
-              class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm sm:text-base text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors"
               :class="{ 'bg-blue-50 text-blue-700': $route.name === item.name }"
             >
               <component :is="item.icon" class="w-5 h-5" />
@@ -27,10 +27,10 @@
             </router-link>
           </div>
         </nav>
-        <div class="absolute bottom-4 left-4 right-4">
+        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t bg-white">
           <button
             @click="logout"
-            class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+            class="flex items-center space-x-3 w-full px-3 py-2.5 rounded-lg text-sm sm:text-base text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors"
           >
             <LogOut class="w-5 h-5" />
             <span>Odhlásit se</span>
@@ -107,19 +107,21 @@
       <!-- Hlavní obsah -->
       <div class="lg:pl-64 flex-1">
         <!-- Mobilní header -->
-        <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-          <button @click="openMobileMenu" class="p-2 rounded-lg hover:bg-gray-100">
-            <Menu class="w-6 h-6" />
-          </button>
-          <h1 class="text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Yolo Finance
-          </h1>
-          <div class="w-10"></div> <!-- Spacer pro vyvážení -->
+        <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+          <div class="px-3 sm:px-4 py-3 flex items-center justify-between">
+            <button @click="openMobileMenu" class="p-2 -ml-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
+              <Menu class="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Yolo Finance
+            </h1>
+            <div class="w-8"></div> <!-- Spacer pro vyvážení -->
+          </div>
         </div>
 
         <!-- Obsah stránky -->
-        <main class="flex-1">
-          <div class="p-4 lg:p-6">
+        <main class="flex-1 min-h-[calc(100vh-60px)] lg:min-h-screen">
+          <div class="p-3 sm:p-4 lg:p-6 pb-safe">
             <router-view />
           </div>
         </main>

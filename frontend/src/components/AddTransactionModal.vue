@@ -1,51 +1,51 @@
 <template>
   <div class="fixed inset-0 z-50 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <div class="flex items-end sm:items-center justify-center min-h-screen text-center">
       <!-- Pozadí overlay -->
       <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="$emit('close')"></div>
 
       <!-- Modal panel -->
-      <div class="inline-block w-full max-w-md p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-xl">
+      <div class="inline-block w-full sm:max-w-md p-4 sm:p-6 sm:my-8 text-left align-bottom sm:align-middle transition-all transform bg-white shadow-xl rounded-t-2xl sm:rounded-xl safe-bottom">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Přidat transakci</h3>
-          <button @click="$emit('close')" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
-            <X class="w-5 h-5" />
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900">Přidat transakci</h3>
+          <button @click="$emit('close')" class="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <X class="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Typ transakce -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Typ transakce</label>
-            <div class="grid grid-cols-2 gap-3">
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Typ transakce</label>
+            <div class="grid grid-cols-2 gap-2 sm:gap-3">
               <button
                 type="button"
                 @click="form.type = 'income'"
-                class="p-3 rounded-lg border text-center transition-colors"
+                class="p-2.5 sm:p-3 rounded-lg border text-center transition-colors"
                 :class="form.type === 'income' 
                   ? 'border-green-500 bg-green-50 text-green-700' 
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
               >
-                <TrendingUp class="w-5 h-5 mx-auto mb-1" />
-                <span class="text-sm font-medium">Příjem</span>
+                <TrendingUp class="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" />
+                <span class="text-xs sm:text-sm font-medium">Příjem</span>
               </button>
               <button
                 type="button"
                 @click="form.type = 'expense'"
-                class="p-3 rounded-lg border text-center transition-colors"
+                class="p-2.5 sm:p-3 rounded-lg border text-center transition-colors"
                 :class="form.type === 'expense' 
                   ? 'border-red-500 bg-red-50 text-red-700' 
                   : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
               >
-                <TrendingDown class="w-5 h-5 mx-auto mb-1" />
-                <span class="text-sm font-medium">Výdaj</span>
+                <TrendingDown class="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" />
+                <span class="text-xs sm:text-sm font-medium">Výdaj</span>
               </button>
             </div>
           </div>
 
           <!-- Částka -->
           <div>
-            <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">Částka (Kč)</label>
+            <label for="amount" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Částka (Kč)</label>
             <input
               id="amount"
               v-model.number="form.amount"
@@ -55,12 +55,13 @@
               required
               class="form-input"
               placeholder="0.00"
+              inputmode="decimal"
             />
           </div>
 
           <!-- Popis -->
           <div>
-            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Popis</label>
+            <label for="description" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Popis</label>
             <input
               id="description"
               v-model="form.description"
@@ -73,7 +74,7 @@
 
           <!-- Kategorie -->
           <div>
-            <label for="category" class="block text-sm font-medium text-gray-700 mb-2">Kategorie</label>
+            <label for="category" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Kategorie</label>
             <select
               id="category"
               v-model="form.category_id"
@@ -93,7 +94,7 @@
 
           <!-- Datum -->
           <div>
-            <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Datum</label>
+            <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Datum</label>
             <input
               id="date"
               v-model="form.date"
@@ -104,15 +105,15 @@
           </div>
 
           <!-- Chybová zpráva -->
-          <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-2.5 sm:p-3">
             <div class="flex items-center">
-              <AlertCircle class="w-5 h-5 text-red-500 mr-2" />
-              <span class="text-sm text-red-700">{{ error }}</span>
+              <AlertCircle class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 flex-shrink-0" />
+              <span class="text-xs sm:text-sm text-red-700">{{ error }}</span>
             </div>
           </div>
 
           <!-- Tlačítka -->
-          <div class="flex space-x-3 pt-4">
+          <div class="flex space-x-2 sm:space-x-3 pt-3 sm:pt-4">
             <button
               type="button"
               @click="$emit('close')"
