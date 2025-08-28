@@ -213,97 +213,63 @@
         </div>
       </div>
 
-      <!-- Rychlé akce a poslední transakce -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        <!-- Rychlé akce -->
-        <div class="card">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Rychlé akce</h3>
-          <div class="grid grid-cols-2 gap-3">
+      <!-- Poslední transakce -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Poslední transakce</h3>
+          <div class="flex items-center gap-2">
             <button
               @click="showAddTransactionModal = true"
-              class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-indigo-500 hover:bg-indigo-50 transition-all group"
+              class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-1"
             >
-              <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mb-2 group-hover:bg-indigo-200">
-                <Plus class="w-5 h-5 text-indigo-600" />
-              </div>
-              <span class="text-sm font-medium text-gray-700 group-hover:text-indigo-600">Transakce</span>
+              <Plus class="w-4 h-4" />
+              Přidat transakci
             </button>
-            <router-link
-              to="/cile"
-              class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-purple-500 hover:bg-purple-50 transition-all group"
-            >
-              <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-2 group-hover:bg-purple-200">
-                <Target class="w-5 h-5 text-purple-600" />
-              </div>
-              <span class="text-sm font-medium text-gray-700 group-hover:text-purple-600">Nový cíl</span>
-            </router-link>
-            <router-link
-              to="/rozpocty"
-              class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-amber-500 hover:bg-amber-50 transition-all group"
-            >
-              <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-2 group-hover:bg-amber-200">
-                <Calculator class="w-5 h-5 text-amber-600" />
-              </div>
-              <span class="text-sm font-medium text-gray-700 group-hover:text-amber-600">Rozpočet</span>
-            </router-link>
-            <button
-              @click="exportData"
-              class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-teal-500 hover:bg-teal-50 transition-all group"
-            >
-              <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center mb-2 group-hover:bg-teal-200">
-                <Download class="w-5 h-5 text-teal-600" />
-              </div>
-              <span class="text-sm font-medium text-gray-700 group-hover:text-teal-600">Export</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Poslední transakce -->
-        <div class="card lg:col-span-2">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Poslední transakce</h3>
             <router-link to="/transakce" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
               Zobrazit vše
             </router-link>
           </div>
-          <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-6 text-gray-500">
-            <Receipt class="w-12 h-12 mx-auto mb-2 text-gray-300" />
-            <p class="text-base">Zatím žádné transakce</p>
-            <button
-              @click="showAddTransactionModal = true"
-              class="mt-2 text-sm text-indigo-600 hover:text-indigo-500 font-medium"
-            >
-              Přidat první transakci
-            </button>
-          </div>
-          <div v-else class="space-y-2">
-            <div
-              v-for="transaction in financeStore.recentTransactions"
-              :key="transaction.id"
-              class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <div class="flex items-center space-x-3 flex-1 min-w-0">
-                <div
-                  class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                  :class="transaction.type === 'income' 
-                    ? 'bg-gradient-to-br from-emerald-400 to-teal-400' 
-                    : 'bg-gradient-to-br from-rose-400 to-pink-400'"
-                >
-                  <CategoryIcon :category="transaction.category" class="w-5 h-5 text-white" />
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate">{{ transaction.description }}</p>
-                  <p class="text-xs text-gray-500">{{ transaction.category }} • {{ formatDate(transaction.date) }}</p>
-                </div>
+        </div>
+        <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-8 text-gray-500">
+          <Receipt class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <p class="text-base">Zatím žádné transakce</p>
+          <button
+            @click="showAddTransactionModal = true"
+            class="mt-2 text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+          >
+            Přidat první transakci
+          </button>
+        </div>
+        <div v-else class="space-y-2">
+          <div
+            v-for="transaction in financeStore.recentTransactions.slice(0, 10)"
+            :key="transaction.id"
+            class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all"
+          >
+            <div class="flex items-center space-x-3 flex-1 min-w-0">
+              <div class="flex-shrink-0">
+                <p class="text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
               </div>
-              <div class="text-right flex-shrink-0 ml-2">
-                <p
-                  class="text-base font-semibold"
-                  :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
-                >
-                  {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
-                </p>
+              <div
+                class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                :class="transaction.type === 'income' 
+                  ? 'bg-gradient-to-br from-emerald-400 to-teal-400' 
+                  : 'bg-gradient-to-br from-rose-400 to-pink-400'"
+              >
+                <CategoryIcon :category="transaction.category" class="w-5 h-5 text-white" />
               </div>
+              <div class="flex-1 min-w-0 ml-2">
+                <p class="text-sm font-medium text-gray-900">{{ transaction.description }}</p>
+                <p class="text-xs text-gray-500">{{ transaction.category }}</p>
+              </div>
+            </div>
+            <div class="text-right flex-shrink-0 ml-4">
+              <p
+                class="text-lg font-semibold"
+                :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+              >
+                {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
+              </p>
             </div>
           </div>
         </div>
@@ -331,7 +297,6 @@ import {
   Plus,
   PiggyBank,
   Calculator,
-  Download,
   Receipt,
   PieChart
 } from 'lucide-vue-next'
@@ -548,11 +513,6 @@ const handleTransactionAdded = () => {
 const updateTrendData = () => {
   // Tato funkce se zavolá při změně období
   // Data se automaticky přepočítají díky computed
-}
-
-const exportData = () => {
-  // Implementace exportu dat
-  alert('Export dat bude implementován')
 }
 
 onMounted(() => {
