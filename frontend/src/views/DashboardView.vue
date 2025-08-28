@@ -137,37 +137,48 @@
         <div class="card">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Rozpočty</h3>
-            <router-link to="/rozpocty" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
-              Zobrazit vše
-            </router-link>
+            <button
+              @click="openBudgetSettings"
+              class="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+            >
+              <Settings class="w-4 h-4" />
+              Upravit
+            </button>
           </div>
           <div v-if="financeStore.budgets.length === 0" class="text-center py-8 text-gray-500">
             <Calculator class="w-12 h-12 mx-auto mb-2 text-gray-300" />
             <p class="text-base">Zatím žádné rozpočty</p>
           </div>
           <div v-else class="space-y-3">
-            <div v-for="budget in financeStore.budgets.slice(0, 4)" :key="budget.id" class="space-y-2">
-              <div class="flex items-center justify-between">
+            <div v-for="budget in displayedBudgets" :key="budget.id">
+              <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center space-x-2">
                   <CategoryIcon :category="budget.category" class="w-5 h-5" />
-                  <span class="text-sm font-medium text-gray-900">{{ budget.category }}</span>
+                  <span class="text-sm font-medium text-gray-900">{{ getCategoryName(budget.category) }}</span>
                 </div>
                 <span class="text-sm text-gray-600">
                   {{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}
                 </span>
               </div>
-              <div class="relative">
-                <div class="w-full bg-gray-200 rounded-full h-2 mb-1">
+              <div class="flex items-center gap-1">
+                <div class="flex-1 bg-gray-200 rounded-full h-2 relative">
                   <div
                     class="h-2 rounded-full transition-all duration-300"
                     :class="getBudgetBarClass(budget)"
                     :style="{ width: `${Math.min(((budget.spent || 0) / budget.amount) * 100, 100)}%` }"
                   ></div>
                 </div>
-                <div class="text-right">
-                  <span class="text-xs text-gray-500">
+                <div class="flex items-center gap-1">
+                  <span 
+                    class="text-xs font-medium min-w-[35px] text-right"
+                    :class="getBudgetPercentageClass(budget)"
+                  >
                     {{ ((budget.spent || 0) / budget.amount * 100).toFixed(0) }}%
                   </span>
+                  <AlertTriangle 
+                    v-if="((budget.spent || 0) / budget.amount) > 1"
+                    class="w-4 h-4 text-red-500 animate-pulse"
+                  />
                 </div>
               </div>
             </div>
@@ -178,9 +189,6 @@
         <div class="card">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Finanční cíle</h3>
-            <router-link to="/cile" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
-              Zobrazit vše
-            </router-link>
           </div>
           <div v-if="financeStore.goals.length === 0" class="text-center py-8 text-gray-500">
             <Target class="w-12 h-12 mx-auto mb-2 text-gray-300" />
@@ -282,11 +290,73 @@
       @close="showAddTransactionModal = false"
       @transaction-added="handleTransactionAdded"
     />
+
+    <!-- Modal pro nastavení rozpočtů -->
+    <div v-if="showBudgetSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] flex flex-col">
+        <div class="p-6 border-b">
+          <h2 class="text-lg font-semibold text-gray-900">Vyberte rozpočty pro zobrazení</h2>
+          <p class="text-sm text-gray-500 mt-1">Zvolte, které rozpočty chcete vidět na dashboardu</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="space-y-3">
+            <div 
+              v-for="budget in financeStore.budgets" 
+              :key="budget.id"
+              class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              @click="toggleBudgetSelection(budget.id)"
+            >
+              <div class="flex items-center space-x-3">
+                <div 
+                  class="w-5 h-5 border-2 rounded flex items-center justify-center"
+                  :class="isBudgetSelected(budget.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'"
+                >
+                  <Check v-if="isBudgetSelected(budget.id)" class="w-3 h-3 text-white" />
+                </div>
+                <CategoryIcon :category="budget.category" class="w-5 h-5" />
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ getCategoryName(budget.category) }}</p>
+                  <p class="text-xs text-gray-500">{{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}</p>
+                </div>
+              </div>
+              <span 
+                class="text-xs px-2 py-1 rounded-full"
+                :class="getBudgetPercentageClass(budget)"
+              >
+                {{ ((budget.spent || 0) / budget.amount * 100).toFixed(0) }}%
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="p-6 border-t flex justify-between">
+          <button
+            @click="selectAllBudgets"
+            class="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            Vybrat vše
+          </button>
+          <div class="flex gap-3">
+            <button
+              @click="showBudgetSettings = false"
+              class="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+            >
+              Zrušit
+            </button>
+            <button
+              @click="saveBudgetSettings"
+              class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Uložit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFinanceStore } from '@/stores/finance'
 import {
@@ -298,7 +368,10 @@ import {
   PiggyBank,
   Calculator,
   Receipt,
-  PieChart
+  PieChart,
+  AlertTriangle,
+  Settings,
+  Check
 } from 'lucide-vue-next'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import CategoryIcon from '@/components/CategoryIcon.vue'
@@ -309,7 +382,10 @@ const authStore = useAuthStore()
 const financeStore = useFinanceStore()
 
 const showAddTransactionModal = ref(false)
+const showBudgetSettings = ref(false)
 const trendPeriod = ref('6')
+const selectedBudgetIds = ref([])
+const tempSelectedBudgetIds = ref([])
 
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('cs-CZ', {
@@ -318,6 +394,13 @@ const currentDate = computed(() => {
     month: 'long',
     day: 'numeric'
   })
+})
+
+const displayedBudgets = computed(() => {
+  if (selectedBudgetIds.value.length === 0) {
+    return financeStore.budgets.slice(0, 4)
+  }
+  return financeStore.budgets.filter(b => selectedBudgetIds.value.includes(b.id))
 })
 
 // Simulované hodnoty změn
@@ -485,6 +568,56 @@ const getBudgetBarClass = (budget) => {
   return 'bg-emerald-500'
 }
 
+const getBudgetPercentageClass = (budget) => {
+  const percentage = (budget.spent || 0) / budget.amount
+  if (percentage >= 1) return 'text-red-600'
+  if (percentage >= 0.8) return 'text-amber-600'
+  if (percentage >= 0.6) return 'text-yellow-600'
+  return 'text-gray-500'
+}
+
+const getCategoryName = (category) => {
+  // Pokud je kategorie už v češtině, vrátíme ji
+  if (!category) return 'Bez kategorie'
+  
+  // Mapování anglických názvů na české
+  const categoryNames = {
+    'Jídlo': 'Jídlo',
+    'Nakupování': 'Nakupování', 
+    'Bydlení': 'Bydlení',
+    'Doprava': 'Doprava',
+    'Zdraví': 'Zdraví',
+    'Oblečení': 'Oblečení',
+    'Zábava': 'Zábava',
+    'Sport': 'Sport',
+    'Cestování': 'Cestování',
+    'Vzdělání': 'Vzdělání',
+    'Elektronika': 'Elektronika',
+    'Pojištění': 'Pojištění',
+    'Energie': 'Energie',
+    'Splátky': 'Splátky',
+    'Ostatní': 'Ostatní',
+    // Pro případ anglických názvů
+    'food': 'Jídlo',
+    'shopping': 'Nakupování',
+    'housing': 'Bydlení',
+    'transport': 'Doprava',
+    'health': 'Zdraví',
+    'clothing': 'Oblečení',
+    'entertainment': 'Zábava',
+    'sports': 'Sport',
+    'travel': 'Cestování',
+    'education': 'Vzdělání',
+    'electronics': 'Elektronika',
+    'insurance': 'Pojištění',
+    'utilities': 'Energie',
+    'loans': 'Splátky',
+    'other': 'Ostatní'
+  }
+  
+  return categoryNames[category] || category
+}
+
 const daysUntilDeadline = (deadline) => {
   const today = new Date()
   const deadlineDate = new Date(deadline)
@@ -506,8 +639,37 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('cs-CZ')
 }
 
+const toggleBudgetSelection = (id) => {
+  const index = tempSelectedBudgetIds.value.indexOf(id)
+  if (index > -1) {
+    tempSelectedBudgetIds.value.splice(index, 1)
+  } else {
+    tempSelectedBudgetIds.value.push(id)
+  }
+}
+
+const isBudgetSelected = (id) => {
+  return tempSelectedBudgetIds.value.includes(id)
+}
+
+const selectAllBudgets = () => {
+  tempSelectedBudgetIds.value = financeStore.budgets.map(b => b.id)
+}
+
+const saveBudgetSettings = () => {
+  selectedBudgetIds.value = [...tempSelectedBudgetIds.value]
+  localStorage.setItem('selectedBudgetIds', JSON.stringify(selectedBudgetIds.value))
+  showBudgetSettings.value = false
+}
+
 const handleTransactionAdded = () => {
   showAddTransactionModal.value = false
+}
+
+// Nastaví dočasné vybrané rozpočty při otevření modalu
+const openBudgetSettings = () => {
+  tempSelectedBudgetIds.value = [...selectedBudgetIds.value]
+  showBudgetSettings.value = true
 }
 
 const updateTrendData = () => {
@@ -517,6 +679,12 @@ const updateTrendData = () => {
 
 onMounted(() => {
   // Data se načtou automaticky v Layout komponentě
+  
+  // Načtení uložených rozpočtů
+  const saved = localStorage.getItem('selectedBudgetIds')
+  if (saved) {
+    selectedBudgetIds.value = JSON.parse(saved)
+  }
 })
 </script>
 

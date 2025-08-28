@@ -9,6 +9,30 @@ import auth
 
 router = APIRouter()
 
+# Mapování category_id na názvy kategorií (podle API /categories)
+CATEGORY_NAMES = {
+    1: "Mzda",
+    2: "Freelance",
+    3: "Investice",
+    4: "Dary",
+    5: "Ostatní příjmy",
+    6: "Jídlo a potraviny",
+    7: "Bydlení",
+    8: "Doprava",
+    9: "Zdraví",
+    10: "Oblečení",
+    11: "Zábava",
+    12: "Restaurace",
+    13: "Sport",
+    14: "Cestování",
+    15: "Vzdělání",
+    16: "Telefon a internet",
+    17: "Pojištění",
+    18: "Energie",
+    19: "Předplatné",
+    20: "Ostatní výdaje"
+}
+
 @router.post("/", response_model=schemas.Budget)
 async def create_budget(
     budget: schemas.BudgetCreate,
@@ -29,6 +53,7 @@ async def create_budget(
         existing_budget.is_active = budget.is_active
         db.commit()
         db.refresh(existing_budget)
+        existing_budget.category = CATEGORY_NAMES.get(existing_budget.category_id, f"Kategorie {existing_budget.category_id}")
         return existing_budget
     
     # Create new budget
@@ -39,6 +64,7 @@ async def create_budget(
     db.add(db_budget)
     db.commit()
     db.refresh(db_budget)
+    db_budget.category = CATEGORY_NAMES.get(db_budget.category_id, f"Kategorie {db_budget.category_id}")
     return db_budget
 
 @router.get("/", response_model=List[schemas.Budget])
@@ -58,6 +84,11 @@ async def read_budgets(
         models.Budget.month == month,
         models.Budget.year == year
     ).all()
+    
+    # Přidáme název kategorie ke každému rozpočtu
+    for budget in budgets:
+        budget.category = CATEGORY_NAMES.get(budget.category_id, f"Kategorie {budget.category_id}")
+    
     return budgets
 
 @router.get("/{budget_id}", response_model=schemas.Budget)

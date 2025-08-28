@@ -88,6 +88,7 @@ class Budget(BudgetBase):
     user_id: int
     spent: float = 0
     created_at: datetime
+    category: Optional[str] = None
     
     class Config:
         from_attributes = True

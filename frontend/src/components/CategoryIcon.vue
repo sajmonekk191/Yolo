@@ -49,13 +49,16 @@ const props = defineProps({
 })
 
 const categoryIcons = {
+  // České názvy
   'Plat': 'Wallet',
   'Mzda': 'Wallet',
   'Freelance': 'Briefcase',
   'Investice': 'TrendingUp',
   'Dary': 'Gift',
   'Ostatní příjem': 'Banknote',
+  'Ostatní příjmy': 'Banknote',
   'Jídlo': 'Utensils',
+  'Jídlo a potraviny': 'ShoppingCart',
   'Nakupování': 'ShoppingCart',
   'Bydlení': 'Home',
   'Doprava': 'Car',
@@ -66,10 +69,14 @@ const categoryIcons = {
   'Cestování': 'Plane',
   'Vzdělání': 'GraduationCap',
   'Elektronika': 'Smartphone',
+  'Telefon a internet': 'Smartphone',
   'Pojištění': 'Shield',
   'Energie': 'Zap',
   'Splátky': 'CreditCard',
-  'Ostatní': 'MoreHorizontal'
+  'Předplatné': 'CreditCard',
+  'Restaurace': 'Utensils',
+  'Ostatní': 'MoreHorizontal',
+  'Ostatní výdaje': 'MoreHorizontal'
 }
 
 const iconMap = {
@@ -103,6 +110,23 @@ const iconName = computed(() => {
 
 const iconComponent = computed(() => iconMap[iconName.value] || MoreHorizontal)
 
+const categoryColors = {
+  'Jídlo a potraviny': 'orange',
+  'Doprava': 'indigo',
+  'Zábava': 'pink',
+  'Energie': 'yellow',
+  'Bydlení': 'blue',
+  'Zdraví': 'red',
+  'Oblečení': 'purple',
+  'Sport': 'green',
+  'Cestování': 'cyan',
+  'Vzdělání': 'blue',
+  'Telefon a internet': 'gray',
+  'Pojištění': 'green',
+  'Předplatné': 'purple',
+  'Restaurace': 'yellow'
+}
+
 const colorClass = computed(() => {
   const colors = {
     green: 'text-green-600',
@@ -116,6 +140,13 @@ const colorClass = computed(() => {
     cyan: 'text-cyan-600',
     gray: 'text-gray-600'
   }
-  return colors[props.color] || 'text-gray-600'
+  
+  // Pokud není specifikována barva, zkusíme ji určit podle kategorie
+  let colorToUse = props.color
+  if (!colorToUse && props.category) {
+    colorToUse = categoryColors[props.category] || 'gray'
+  }
+  
+  return colors[colorToUse] || 'text-gray-600'
 })
 </script>

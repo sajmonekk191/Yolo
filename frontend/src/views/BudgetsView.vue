@@ -293,19 +293,8 @@ const getMonthName = (month) => {
 }
 
 const getBudgetSpent = (budget) => {
-  // Spočítej výdaje pro danou kategorii v daném měsíci
-  const currentMonth = new Date().getMonth() + 1
-  const currentYear = new Date().getFullYear()
-  
-  // Pro jednoduchost používáme aktuální měsíc - v reálné aplikaci by se filtrovalo podle budget.month a budget.year
-  return financeStore.transactions
-    .filter(t => 
-      t.type === 'expense' && 
-      t.category_id === budget.category_id &&
-      new Date(t.date).getMonth() + 1 === currentMonth &&
-      new Date(t.date).getFullYear() === currentYear
-    )
-    .reduce((sum, t) => sum + t.amount, 0)
+  // Použij hodnotu spent z databáze (backend již vypočítává správnou hodnotu)
+  return budget.spent || 0
 }
 
 const getBudgetRemaining = (budget) => {
