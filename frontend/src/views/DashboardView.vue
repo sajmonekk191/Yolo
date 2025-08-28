@@ -189,15 +189,27 @@
         <div class="card">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Finanční cíle</h3>
+            <button
+              @click="openGoalSettings"
+              class="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+            >
+              <Settings class="w-4 h-4" />
+              Upravit
+            </button>
           </div>
           <div v-if="financeStore.goals.length === 0" class="text-center py-8 text-gray-500">
             <Target class="w-12 h-12 mx-auto mb-2 text-gray-300" />
             <p class="text-base">Zatím žádné cíle</p>
           </div>
           <div v-else class="space-y-3">
-            <div v-for="goal in financeStore.activeGoals.slice(0, 3)" :key="goal.id" class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
+            <div v-for="goal in displayedGoals" :key="goal.id" class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-gray-900">{{ goal.name }}</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                    <component :is="getGoalIcon(goal.name)" class="w-4 h-4 text-white" />
+                  </div>
+                  <span class="text-sm font-medium text-gray-900">{{ goal.name }}</span>
+                </div>
                 <span class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">
                   {{ daysUntilDeadline(goal.deadline) }} dní
                 </span>
@@ -352,6 +364,69 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal pro nastavení cílů -->
+    <div v-if="showGoalSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] flex flex-col">
+        <div class="p-6 border-b">
+          <h2 class="text-lg font-semibold text-gray-900">Vyberte cíle pro zobrazení</h2>
+          <p class="text-sm text-gray-500 mt-1">Zvolte, které cíle chcete vidět na dashboardu</p>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+          <div class="space-y-3">
+            <div 
+              v-for="goal in financeStore.goals" 
+              :key="goal.id"
+              class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              @click="toggleGoalSelection(goal.id)"
+            >
+              <div class="flex items-center space-x-3">
+                <div 
+                  class="w-5 h-5 border-2 rounded flex items-center justify-center"
+                  :class="isGoalSelected(goal.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'"
+                >
+                  <Check v-if="isGoalSelected(goal.id)" class="w-3 h-3 text-white" />
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                  <component :is="getGoalIcon(goal.name)" class="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ goal.name }}</p>
+                  <p class="text-xs text-gray-500">{{ formatCurrency(goal.current_amount) }} / {{ formatCurrency(goal.target_amount) }}</p>
+                </div>
+              </div>
+              <span 
+                class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700"
+              >
+                {{ ((goal.current_amount / goal.target_amount) * 100).toFixed(0) }}%
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="p-6 border-t flex justify-between">
+          <button
+            @click="selectAllGoals"
+            class="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+          >
+            Vybrat vše
+          </button>
+          <div class="flex gap-3">
+            <button
+              @click="showGoalSettings = false"
+              class="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+            >
+              Zrušit
+            </button>
+            <button
+              @click="saveGoalSettings"
+              class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Uložit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -371,7 +446,17 @@ import {
   PieChart,
   AlertTriangle,
   Settings,
-  Check
+  Check,
+  Home,
+  Car,
+  Plane,
+  GraduationCap,
+  Heart,
+  Smartphone,
+  Gift,
+  Trophy,
+  Briefcase,
+  DollarSign
 } from 'lucide-vue-next'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import CategoryIcon from '@/components/CategoryIcon.vue'
@@ -383,9 +468,12 @@ const financeStore = useFinanceStore()
 
 const showAddTransactionModal = ref(false)
 const showBudgetSettings = ref(false)
+const showGoalSettings = ref(false)
 const trendPeriod = ref('6')
 const selectedBudgetIds = ref([])
 const tempSelectedBudgetIds = ref([])
+const selectedGoalIds = ref([])
+const tempSelectedGoalIds = ref([])
 
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('cs-CZ', {
@@ -401,6 +489,14 @@ const displayedBudgets = computed(() => {
     return financeStore.budgets.slice(0, 4)
   }
   return financeStore.budgets.filter(b => selectedBudgetIds.value.includes(b.id))
+})
+
+const displayedGoals = computed(() => {
+  const activeGoals = financeStore.activeGoals
+  if (selectedGoalIds.value.length === 0) {
+    return activeGoals.slice(0, 3)
+  }
+  return activeGoals.filter(g => selectedGoalIds.value.includes(g.id))
 })
 
 // Simulované hodnoty změn
@@ -662,6 +758,48 @@ const saveBudgetSettings = () => {
   showBudgetSettings.value = false
 }
 
+const getGoalIcon = (goalName) => {
+  const name = goalName.toLowerCase()
+  if (name.includes('dům') || name.includes('byt') || name.includes('bydlen')) return Home
+  if (name.includes('auto') || name.includes('vůz')) return Car
+  if (name.includes('dovolen') || name.includes('cest')) return Plane
+  if (name.includes('škol') || name.includes('studium') || name.includes('vzdělán')) return GraduationCap
+  if (name.includes('svatb') || name.includes('rodina')) return Heart
+  if (name.includes('telefon') || name.includes('elektronik')) return Smartphone
+  if (name.includes('dárek') || name.includes('vánoce')) return Gift
+  if (name.includes('sport') || name.includes('fitness')) return Trophy
+  if (name.includes('práce') || name.includes('podnikání')) return Briefcase
+  return DollarSign
+}
+
+const toggleGoalSelection = (id) => {
+  const index = tempSelectedGoalIds.value.indexOf(id)
+  if (index > -1) {
+    tempSelectedGoalIds.value.splice(index, 1)
+  } else {
+    tempSelectedGoalIds.value.push(id)
+  }
+}
+
+const isGoalSelected = (id) => {
+  return tempSelectedGoalIds.value.includes(id)
+}
+
+const selectAllGoals = () => {
+  tempSelectedGoalIds.value = financeStore.goals.map(g => g.id)
+}
+
+const saveGoalSettings = () => {
+  selectedGoalIds.value = [...tempSelectedGoalIds.value]
+  localStorage.setItem('selectedGoalIds', JSON.stringify(selectedGoalIds.value))
+  showGoalSettings.value = false
+}
+
+const openGoalSettings = () => {
+  tempSelectedGoalIds.value = [...selectedGoalIds.value]
+  showGoalSettings.value = true
+}
+
 const handleTransactionAdded = () => {
   showAddTransactionModal.value = false
 }
@@ -681,9 +819,15 @@ onMounted(() => {
   // Data se načtou automaticky v Layout komponentě
   
   // Načtení uložených rozpočtů
-  const saved = localStorage.getItem('selectedBudgetIds')
-  if (saved) {
-    selectedBudgetIds.value = JSON.parse(saved)
+  const savedBudgets = localStorage.getItem('selectedBudgetIds')
+  if (savedBudgets) {
+    selectedBudgetIds.value = JSON.parse(savedBudgets)
+  }
+  
+  // Načtení uložených cílů
+  const savedGoals = localStorage.getItem('selectedGoalIds')
+  if (savedGoals) {
+    selectedGoalIds.value = JSON.parse(savedGoals)
   }
 })
 </script>
