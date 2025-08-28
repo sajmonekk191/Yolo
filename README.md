@@ -121,12 +121,17 @@ python3 init_db.py
 
 - ✅ Registrace a přihlášení uživatelů
 - ✅ Dashboard s přehledem financí
-- ✅ Správa příjmů a výdajů
+- ✅ Správa příjmů a výdajů  
 - ✅ Finanční cíle s progress bary
 - ✅ Měsíční rozpočty podle kategorií
 - ✅ Kompletní CRUD operace
 - ✅ Responzivní design pro mobily, tablety a desktop
 - ✅ České lokalizace
+- ✅ **NOVĚ: Interaktivní grafy a vizualizace (Chart.js)**
+- ✅ **NOVĚ: Měsíční trendy příjmů a výdajů**
+- ✅ **NOVĚ: Rozložení výdajů podle kategorií**
+- ✅ **NOVĚ: Statistické karty s gradientním designem**
+- ✅ **NOVĚ: Pokročilé API endpointy pro analýzu dat**
 
 ## 🚨 Řešení problémů
 

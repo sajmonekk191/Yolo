@@ -36,13 +36,41 @@ import {
 const props = defineProps({
   icon: {
     type: String,
-    required: true
+    required: false
+  },
+  category: {
+    type: String,
+    required: false
   },
   color: {
     type: String,
     default: 'gray'
   }
 })
+
+const categoryIcons = {
+  'Plat': 'Wallet',
+  'Mzda': 'Wallet',
+  'Freelance': 'Briefcase',
+  'Investice': 'TrendingUp',
+  'Dary': 'Gift',
+  'Ostatní příjem': 'Banknote',
+  'Jídlo': 'Utensils',
+  'Nakupování': 'ShoppingCart',
+  'Bydlení': 'Home',
+  'Doprava': 'Car',
+  'Zdraví': 'Heart',
+  'Oblečení': 'Shirt',
+  'Zábava': 'Music',
+  'Sport': 'Dumbbell',
+  'Cestování': 'Plane',
+  'Vzdělání': 'GraduationCap',
+  'Elektronika': 'Smartphone',
+  'Pojištění': 'Shield',
+  'Energie': 'Zap',
+  'Splátky': 'CreditCard',
+  'Ostatní': 'MoreHorizontal'
+}
 
 const iconMap = {
   Banknote,
@@ -67,7 +95,13 @@ const iconMap = {
   MoreHorizontal
 }
 
-const iconComponent = computed(() => iconMap[props.icon] || MoreHorizontal)
+const iconName = computed(() => {
+  if (props.icon) return props.icon
+  if (props.category) return categoryIcons[props.category] || 'MoreHorizontal'
+  return 'MoreHorizontal'
+})
+
+const iconComponent = computed(() => iconMap[iconName.value] || MoreHorizontal)
 
 const colorClass = computed(() => {
   const colors = {
