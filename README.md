@@ -153,9 +153,3 @@ pip install email-validator
 - Frontend běží standardně na portu 5173
 - Pokud je obsazený, Vite automaticky použije 5174
 - Backend běží na portu 8000
-
-## 📞 Kontakt
-
-Projekt vytvořen pro Yolo Finance
-Verze: 1.0.0
-Datum: 2025-08-22
