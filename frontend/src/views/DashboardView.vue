@@ -117,7 +117,16 @@
 
         <!-- Kategorie výdajů -->
         <div class="card">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Rozložení výdajů</h3>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Rozložení výdajů</h3>
+            <select
+              v-model="expensePeriod"
+              class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            >
+              <option value="month">Tento měsíc</option>
+              <option value="all">Celkově</option>
+            </select>
+          </div>
           <div class="h-64 sm:h-80">
             <DoughnutChart v-if="categoryChartData && categoryChartData.labels.length > 0" :data="categoryChartData" />
             <div v-else class="h-full flex items-center justify-center text-gray-500">
@@ -126,6 +135,23 @@
                 <p class="text-sm">Zatím žádné výdaje</p>
                 <p class="text-xs mt-1">Data se zobrazí po přidání transakcí</p>
               </div>
+            </div>
+          </div>
+          <!-- Legenda s částkami -->
+          <div v-if="categoryChartData && categoryChartData.labels.length > 0" class="mt-4 space-y-2">
+            <div 
+              v-for="(label, index) in categoryChartData.labels.slice(0, 5)" 
+              :key="label"
+              class="flex items-center justify-between text-sm"
+            >
+              <div class="flex items-center space-x-2">
+                <div 
+                  class="w-3 h-3 rounded-full"
+                  :style="`background-color: ${categoryChartData.datasets[0].backgroundColor[index]}`"
+                ></div>
+                <span class="text-gray-700">{{ label }}</span>
+              </div>
+              <span class="font-medium text-gray-900">{{ formatCurrency(categoryChartData.datasets[0].data[index]) }}</span>
             </div>
           </div>
         </div>
@@ -477,6 +503,7 @@ const selectedTransaction = ref(null)
 const showBudgetSettings = ref(false)
 const showGoalSettings = ref(false)
 const trendPeriod = ref('6')
+const expensePeriod = ref('month')
 const selectedBudgetIds = ref([])
 const tempSelectedBudgetIds = ref([])
 const selectedGoalIds = ref([])
@@ -629,12 +656,27 @@ const categoryChartData = computed(() => {
     return null
   }
   
-  financeStore.transactions
-    .filter(t => t.type === 'expense')
-    .forEach(t => {
-      if (t.category && t.category !== 'undefined') {
-        categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount
-      }
+  // Filtrujeme transakce podle období
+  let filteredTransactions = financeStore.transactions.filter(t => t.type === 'expense')
+  
+  if (expensePeriod.value === 'month') {
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+    
+    filteredTransactions = filteredTransactions.filter(t => {
+      const transDate = new Date(t.date)
+      return transDate.getMonth() === currentMonth && transDate.getFullYear() === currentYear
+    })
+  }
+  
+  // Seskupíme výdaje podle kategorie
+  filteredTransactions.forEach(t => {
+      // Získáme název kategorie z category_id
+      const category = financeStore.categories.find(c => c.id === t.category_id)
+      const categoryName = category ? category.name : 'Ostatní'
+      
+      categoryTotals[categoryName] = (categoryTotals[categoryName] || 0) + t.amount
     })
   
   const labels = Object.keys(categoryTotals)
@@ -644,10 +686,15 @@ const categoryChartData = computed(() => {
     return null
   }
   
+  // Seřadíme podle hodnoty (od největší)
+  const sortedData = labels
+    .map((label, index) => ({ label, value: data[index] }))
+    .sort((a, b) => b.value - a.value)
+  
   return {
-    labels,
+    labels: sortedData.map(item => item.label),
     datasets: [{
-      data,
+      data: sortedData.map(item => item.value),
       backgroundColor: [
         'rgb(99, 102, 241)',
         'rgb(168, 85, 247)',
@@ -656,7 +703,9 @@ const categoryChartData = computed(() => {
         'rgb(250, 204, 21)',
         'rgb(34, 197, 94)',
         'rgb(20, 184, 166)',
-        'rgb(59, 130, 246)'
+        'rgb(59, 130, 246)',
+        'rgb(239, 68, 68)',
+        'rgb(107, 114, 128)'
       ],
       borderWidth: 0
     }]
