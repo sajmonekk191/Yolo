@@ -98,60 +98,42 @@
         </div>
       </div>
 
-      <!-- Grafy a diagramy -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <!-- Graf příjmů a výdajů -->
+      <div class="w-full">
         <!-- Měsíční trend -->
-        <div class="card lg:col-span-2">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Příjmy vs Výdaje</h3>
-            <select v-model="trendPeriod" @change="updateTrendData" class="text-sm border-gray-300 rounded-lg px-3 py-1.5">
-              <option value="3">Poslední 3 měsíce</option>
-              <option value="6">Posledních 6 měsíců</option>
-              <option value="12">Poslední rok</option>
-            </select>
-          </div>
-          <div class="h-64 sm:h-80">
-            <LineChart v-if="trendChartData" :data="trendChartData" />
-          </div>
-        </div>
-
-        <!-- Kategorie výdajů -->
         <div class="card">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Rozložení výdajů</h3>
-            <select
-              v-model="expensePeriod"
-              class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            >
-              <option value="month">Tento měsíc</option>
-              <option value="all">Celkově</option>
-            </select>
-          </div>
-          <div class="h-64 sm:h-80">
-            <DoughnutChart v-if="categoryChartData && categoryChartData.labels.length > 0" :data="categoryChartData" />
-            <div v-else class="h-full flex items-center justify-center text-gray-500">
-              <div class="text-center">
-                <PieChart class="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                <p class="text-sm">Zatím žádné výdaje</p>
-                <p class="text-xs mt-1">Data se zobrazí po přidání transakcí</p>
+            <h3 class="text-lg font-semibold text-gray-900">Příjmy vs Výdaje</h3>
+            <div class="flex items-center space-x-2">
+              <div class="hidden sm:flex items-center space-x-4 mr-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                  <span class="text-sm text-gray-600">Příjmy</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                  <span class="text-sm text-gray-600">Výdaje</span>
+                </div>
               </div>
+              <select 
+                v-model="trendPeriod" 
+                @change="updateTrendData" 
+                class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              >
+                <option value="3">3 měsíce</option>
+                <option value="6">6 měsíců</option>
+                <option value="12">12 měsíců</option>
+              </select>
             </div>
           </div>
-          <!-- Legenda s částkami -->
-          <div v-if="categoryChartData && categoryChartData.labels.length > 0" class="mt-4 space-y-2">
-            <div 
-              v-for="(label, index) in categoryChartData.labels.slice(0, 5)" 
-              :key="label"
-              class="flex items-center justify-between text-sm"
-            >
-              <div class="flex items-center space-x-2">
-                <div 
-                  class="w-3 h-3 rounded-full"
-                  :style="`background-color: ${categoryChartData.datasets[0].backgroundColor[index]}`"
-                ></div>
-                <span class="text-gray-700">{{ label }}</span>
+          <div class="h-64 sm:h-80">
+            <LineChart v-if="trendChartData && trendChartData.labels.length > 0" :data="trendChartData" :key="chartKey" />
+            <div v-else class="h-full flex items-center justify-center text-gray-500">
+              <div class="text-center">
+                <TrendingUp class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <p class="text-sm">Zatím žádná data</p>
+                <p class="text-xs mt-1">Graf se zobrazí po přidání transakcí</p>
               </div>
-              <span class="font-medium text-gray-900">{{ formatCurrency(categoryChartData.datasets[0].data[index]) }}</span>
             </div>
           </div>
         </div>
@@ -473,7 +455,6 @@ import {
   PiggyBank,
   Calculator,
   Receipt,
-  PieChart,
   AlertTriangle,
   Settings,
   Check,
@@ -492,7 +473,6 @@ import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import EditTransactionModal from '@/components/EditTransactionModal.vue'
 import CategoryIcon from '@/components/CategoryIcon.vue'
 import LineChart from '@/components/LineChart.vue'
-import DoughnutChart from '@/components/DoughnutChart.vue'
 
 const authStore = useAuthStore()
 const financeStore = useFinanceStore()
@@ -503,7 +483,7 @@ const selectedTransaction = ref(null)
 const showBudgetSettings = ref(false)
 const showGoalSettings = ref(false)
 const trendPeriod = ref('6')
-const expensePeriod = ref('month')
+const chartKey = ref(0)
 const selectedBudgetIds = ref([])
 const tempSelectedBudgetIds = ref([])
 const selectedGoalIds = ref([])
@@ -550,44 +530,7 @@ const savingsRate = computed(() => {
 // Data pro grafy
 const trendChartData = computed(() => {
   if (!financeStore.transactions || financeStore.transactions.length === 0) {
-    // Pokud nejsou data, vrátíme simulovaná
-    const months = []
-    const income = []
-    const expenses = []
-    
-    const monthCount = parseInt(trendPeriod.value)
-    const currentDate = new Date()
-    
-    for (let i = monthCount - 1; i >= 0; i--) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
-      months.push(date.toLocaleDateString('cs-CZ', { month: 'short' }))
-      
-      // Demo data
-      income.push(Math.floor(Math.random() * 20000 + 40000))
-      expenses.push(Math.floor(Math.random() * 15000 + 25000))
-    }
-    
-    return {
-      labels: months,
-      datasets: [
-        {
-          label: 'Příjmy',
-          data: income,
-          borderColor: 'rgb(16, 185, 129)',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.4,
-          fill: true
-        },
-        {
-          label: 'Výdaje',
-          data: expenses,
-          borderColor: 'rgb(244, 63, 94)',
-          backgroundColor: 'rgba(244, 63, 94, 0.1)',
-          tension: 0.4,
-          fill: true
-        }
-      ]
-    }
+    return null
   }
   
   // Skutečná data z transakcí
@@ -596,11 +539,14 @@ const trendChartData = computed(() => {
   const currentDate = new Date()
   
   // Inicializace měsíců
+  const monthLabels = []
   for (let i = monthCount - 1; i >= 0; i--) {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+    const monthName = date.toLocaleDateString('cs-CZ', { month: 'short', year: '2-digit' })
+    monthLabels.push(key)
     monthlyData[key] = { 
-      label: date.toLocaleDateString('cs-CZ', { month: 'short' }),
+      label: monthName,
       income: 0, 
       expenses: 0 
     }
@@ -620,11 +566,10 @@ const trendChartData = computed(() => {
     }
   })
   
-  // Převod na pole pro graf
-  const sortedMonths = Object.keys(monthlyData).sort()
-  const labels = sortedMonths.map(key => monthlyData[key].label)
-  const incomeData = sortedMonths.map(key => monthlyData[key].income)
-  const expensesData = sortedMonths.map(key => monthlyData[key].expenses)
+  // Použijeme pořadí z monthLabels (chronologické)
+  const labels = monthLabels.map(key => monthlyData[key].label)
+  const incomeData = monthLabels.map(key => monthlyData[key].income)
+  const expensesData = monthLabels.map(key => monthlyData[key].expenses)
   
   return {
     labels,
@@ -632,85 +577,33 @@ const trendChartData = computed(() => {
       {
         label: 'Příjmy',
         data: incomeData,
-        borderColor: 'rgb(16, 185, 129)',
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-        tension: 0.4,
-        fill: true
+        borderColor: 'rgb(34, 197, 94)',
+        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: 'rgb(34, 197, 94)',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
       },
       {
         label: 'Výdaje',
         data: expensesData,
-        borderColor: 'rgb(244, 63, 94)',
-        backgroundColor: 'rgba(244, 63, 94, 0.1)',
-        tension: 0.4,
-        fill: true
+        borderColor: 'rgb(239, 68, 68)',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointBackgroundColor: 'rgb(239, 68, 68)',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
       }
     ]
   }
 })
 
-const categoryChartData = computed(() => {
-  const categoryTotals = {}
-  
-  if (!financeStore.transactions || financeStore.transactions.length === 0) {
-    return null
-  }
-  
-  // Filtrujeme transakce podle období
-  let filteredTransactions = financeStore.transactions.filter(t => t.type === 'expense')
-  
-  if (expensePeriod.value === 'month') {
-    const now = new Date()
-    const currentMonth = now.getMonth()
-    const currentYear = now.getFullYear()
-    
-    filteredTransactions = filteredTransactions.filter(t => {
-      const transDate = new Date(t.date)
-      return transDate.getMonth() === currentMonth && transDate.getFullYear() === currentYear
-    })
-  }
-  
-  // Seskupíme výdaje podle kategorie
-  filteredTransactions.forEach(t => {
-      // Získáme název kategorie z category_id
-      const category = financeStore.categories.find(c => c.id === t.category_id)
-      const categoryName = category ? category.name : 'Ostatní'
-      
-      categoryTotals[categoryName] = (categoryTotals[categoryName] || 0) + t.amount
-    })
-  
-  const labels = Object.keys(categoryTotals)
-  const data = Object.values(categoryTotals)
-  
-  if (labels.length === 0) {
-    return null
-  }
-  
-  // Seřadíme podle hodnoty (od největší)
-  const sortedData = labels
-    .map((label, index) => ({ label, value: data[index] }))
-    .sort((a, b) => b.value - a.value)
-  
-  return {
-    labels: sortedData.map(item => item.label),
-    datasets: [{
-      data: sortedData.map(item => item.value),
-      backgroundColor: [
-        'rgb(99, 102, 241)',
-        'rgb(168, 85, 247)',
-        'rgb(236, 72, 153)',
-        'rgb(251, 146, 60)',
-        'rgb(250, 204, 21)',
-        'rgb(34, 197, 94)',
-        'rgb(20, 184, 166)',
-        'rgb(59, 130, 246)',
-        'rgb(239, 68, 68)',
-        'rgb(107, 114, 128)'
-      ],
-      borderWidth: 0
-    }]
-  }
-})
 
 const getBudgetBarClass = (budget) => {
   const percentage = (budget.spent || 0) / budget.amount
@@ -858,6 +751,8 @@ const openGoalSettings = () => {
 
 const handleTransactionAdded = () => {
   showAddTransactionModal.value = false
+  // Vynutíme re-render grafu změnou key
+  chartKey.value++
 }
 
 const openEditTransaction = (transaction) => {
@@ -868,7 +763,15 @@ const openEditTransaction = (transaction) => {
 const handleTransactionUpdated = () => {
   showEditTransactionModal.value = false
   selectedTransaction.value = null
+  // Vynutíme re-render grafu změnou key
+  chartKey.value++
 }
+
+// Watch na změny transakcí pro okamžitou aktualizaci grafu
+watch(() => financeStore.transactions, () => {
+  // Když se změní transakce, vynutíme re-render grafu
+  chartKey.value++
+}, { deep: true })
 
 // Nastaví dočasné vybrané rozpočty při otevření modalu
 const openBudgetSettings = () => {
@@ -877,8 +780,8 @@ const openBudgetSettings = () => {
 }
 
 const updateTrendData = () => {
-  // Tato funkce se zavolá při změně období
-  // Data se automaticky přepočítají díky computed
+  // Data se automaticky přepočítají díky computed property
+  // Tato funkce je zde jen pro případné budoucí rozšíření
 }
 
 onMounted(() => {

@@ -76,7 +76,8 @@ export const useFinanceStore = defineStore('finance', {
     async createTransaction(transaction) {
       try {
         const response = await transactionsAPI.create(transaction)
-        this.transactions.unshift(response.data)
+        // Načteme všechny transakce znovu, aby byly seřazené a měly všechny data
+        await this.fetchTransactions()
         await this.fetchStats()
         return { success: true, data: response.data }
       } catch (error) {
@@ -93,8 +94,11 @@ export const useFinanceStore = defineStore('finance', {
         const response = await transactionsAPI.update(id, transaction)
         const index = this.transactions.findIndex(t => t.id === id)
         if (index !== -1) {
-          this.transactions[index] = response.data
+          // Nahradíme celý objekt, aby se aktualizovaly všechny property včetně category
+          this.transactions.splice(index, 1, response.data)
         }
+        // Aktualizujeme také recentTransactions pro dashboard
+        await this.fetchTransactions()
         await this.fetchStats()
         return { success: true, data: response.data }
       } catch (error) {
