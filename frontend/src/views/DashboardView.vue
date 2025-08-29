@@ -18,81 +18,100 @@
 
     <div v-else class="space-y-6">
       <!-- Finanční statistiky -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         <!-- Celkový zůstatek -->
-        <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg sm:col-span-2 lg:col-span-1">
-          <div class="flex items-center justify-between">
+        <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl sm:col-span-2 xl:col-span-1 relative overflow-hidden p-4 sm:p-5">
+          <div class="absolute inset-0 bg-white opacity-5"></div>
+          <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0">
-              <p class="text-indigo-100 text-xs sm:text-sm font-medium opacity-90">Celkový zůstatek</p>
-              <p class="text-2xl sm:text-3xl font-bold truncate">{{ formatCurrency(financeStore.stats.balance) }}</p>
+              <p class="text-indigo-100 text-[10px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">Celkový zůstatek</p>
+              <p class="text-xl sm:text-2xl lg:text-3xl font-bold truncate">{{ formatCurrency(totalBalance) }}</p>
               <p class="text-xs text-indigo-100 mt-1 opacity-75">
                 {{ balanceChange >= 0 ? '+' : '' }}{{ formatCurrency(balanceChange) }} tento měsíc
               </p>
             </div>
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-white bg-opacity-20 backdrop-blur rounded-xl flex items-center justify-center flex-shrink-0 ml-3">
-              <Wallet class="w-6 h-6 sm:w-7 sm:h-7" />
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-white bg-opacity-20 backdrop-blur rounded-xl flex items-center justify-center flex-shrink-0 ml-2 sm:ml-3">
+              <Wallet class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
             </div>
           </div>
         </div>
 
         <!-- Měsíční příjmy -->
-        <div class="card bg-gradient-to-br from-emerald-50 to-teal-50 border-0">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-600 text-xs sm:text-sm font-medium">Měsíční příjmy</p>
-              <p class="text-xl sm:text-2xl font-bold text-emerald-600 truncate">{{ formatCurrency(financeStore.stats.monthlyIncome) }}</p>
-              <div class="flex items-center mt-1">
-                <TrendingUp v-if="incomeChange >= 0" class="w-3 h-3 text-emerald-500 mr-1" />
-                <TrendingDown v-else class="w-3 h-3 text-red-500 mr-1" />
-                <span class="text-xs" :class="incomeChange >= 0 ? 'text-emerald-600' : 'text-red-600'">
-                  {{ Math.abs(incomeChange).toFixed(1) }}% oproti minulému měsíci
-                </span>
+        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+          <div class="relative flex items-center justify-between">
+            <div class="flex-1 min-w-0 pr-2">
+              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Příjmy</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats.monthlyIncome) }}</p>
+              <div class="flex items-center mt-2">
+                <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium" 
+                     :class="incomeChange >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+                  <TrendingUp v-if="incomeChange >= 0" class="w-3 h-3 mr-1" />
+                  <TrendingDown v-else class="w-3 h-3 mr-1" />
+                  {{ incomeChange >= 0 ? '+' : '' }}{{ incomeChange.toFixed(1) }}%
+                </div>
+                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
             </div>
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-emerald-400 to-teal-400 rounded-xl flex items-center justify-center flex-shrink-0 ml-3 shadow-lg">
-              <TrendingUp class="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <TrendingUp class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
         </div>
 
         <!-- Měsíční výdaje -->
-        <div class="card bg-gradient-to-br from-rose-50 to-pink-50 border-0">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-600 text-xs sm:text-sm font-medium">Měsíční výdaje</p>
-              <p class="text-xl sm:text-2xl font-bold text-rose-600 truncate">{{ formatCurrency(financeStore.stats.monthlyExpenses) }}</p>
-              <div class="flex items-center mt-1">
-                <TrendingDown v-if="expenseChange <= 0" class="w-3 h-3 text-emerald-500 mr-1" />
-                <TrendingUp v-else class="w-3 h-3 text-red-500 mr-1" />
-                <span class="text-xs" :class="expenseChange <= 0 ? 'text-emerald-600' : 'text-red-600'">
-                  {{ Math.abs(expenseChange).toFixed(1) }}% oproti minulému měsíci
-                </span>
+        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+          <div class="relative flex items-center justify-between">
+            <div class="flex-1 min-w-0 pr-2">
+              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Výdaje</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats.monthlyExpenses) }}</p>
+              <div class="flex items-center mt-2">
+                <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                     :class="expenseChange <= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+                  <TrendingDown v-if="expenseChange <= 0" class="w-3 h-3 mr-1" />
+                  <TrendingUp v-else class="w-3 h-3 mr-1" />
+                  {{ expenseChange >= 0 ? '+' : '' }}{{ expenseChange.toFixed(1) }}%
+                </div>
+                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
             </div>
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-rose-400 to-pink-400 rounded-xl flex items-center justify-center flex-shrink-0 ml-3 shadow-lg">
-              <TrendingDown class="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <TrendingDown class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
         </div>
 
         <!-- Úspory -->
-        <div class="card bg-gradient-to-br from-amber-50 to-orange-50 border-0 sm:col-span-2 lg:col-span-1">
-          <div class="flex items-center justify-between">
-            <div class="flex-1 min-w-0">
-              <p class="text-gray-600 text-xs sm:text-sm font-medium">Měsíční úspory</p>
-              <p class="text-xl sm:text-2xl font-bold text-amber-600 truncate">
-                {{ formatCurrency(financeStore.stats.monthlyIncome - financeStore.stats.monthlyExpenses) }}
+        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow sm:col-span-2 xl:col-span-1 p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+          <div class="relative flex items-center justify-between">
+            <div class="flex-1 min-w-0 pr-2">
+              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Úspory</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mt-1 truncate" 
+                 :class="balanceChange >= 0 ? 'text-gray-900' : 'text-red-600'">
+                {{ formatCurrency(balanceChange) }}
               </p>
-              <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                <div
-                  class="bg-gradient-to-r from-amber-400 to-orange-400 h-1.5 rounded-full transition-all duration-300"
-                  :style="{ width: `${savingsRate}%` }"
-                ></div>
+              <div class="mt-3">
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-xs text-gray-500">Míra úspor</span>
+                  <span class="text-xs font-semibold" 
+                        :class="savingsRate >= 20 ? 'text-emerald-600' : savingsRate >= 10 ? 'text-amber-600' : 'text-red-600'">
+                    {{ savingsRate.toFixed(1) }}%
+                  </span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="h-2 rounded-full transition-all duration-500 ease-out"
+                       :class="savingsRate >= 20 ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 
+                               savingsRate >= 10 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 
+                               'bg-gradient-to-r from-red-400 to-rose-400'"
+                       :style="{ width: `${Math.min(savingsRate, 100)}%` }">
+                  </div>
+                </div>
               </div>
-              <p class="text-xs text-gray-500 mt-1">{{ savingsRate.toFixed(1) }}% míra úspor</p>
             </div>
-            <div class="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-400 to-orange-400 rounded-xl flex items-center justify-center flex-shrink-0 ml-3 shadow-lg">
-              <PiggyBank class="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <PiggyBank class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
         </div>
@@ -102,23 +121,23 @@
       <div class="w-full">
         <!-- Měsíční trend -->
         <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Příjmy vs Výdaje</h3>
-            <div class="flex items-center space-x-2">
-              <div class="hidden sm:flex items-center space-x-4 mr-4">
-                <div class="flex items-center space-x-2">
-                  <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                  <span class="text-sm text-gray-600">Příjmy</span>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Příjmy vs Výdaje</h3>
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div class="hidden xs:flex items-center gap-2 sm:gap-4 mr-2 sm:mr-4">
+                <div class="flex items-center gap-1 sm:gap-2">
+                  <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></div>
+                  <span class="text-xs sm:text-sm text-gray-600">Příjmy</span>
                 </div>
-                <div class="flex items-center space-x-2">
-                  <div class="w-3 h-3 rounded-full bg-rose-500"></div>
-                  <span class="text-sm text-gray-600">Výdaje</span>
+                <div class="flex items-center gap-1 sm:gap-2">
+                  <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500"></div>
+                  <span class="text-xs sm:text-sm text-gray-600">Výdaje</span>
                 </div>
               </div>
               <select 
                 v-model="trendPeriod" 
                 @change="updateTrendData" 
-                class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="3">3 měsíce</option>
                 <option value="6">6 měsíců</option>
@@ -140,17 +159,17 @@
       </div>
 
       <!-- Rozpočty a cíle -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
         <!-- Rozpočty -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Rozpočty</h3>
+        <div class="card p-4 sm:p-5">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Rozpočty</h3>
             <button
               @click="openBudgetSettings"
-              class="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+              class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
             >
-              <Settings class="w-4 h-4" />
-              Upravit
+              <Settings class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span class="hidden sm:inline">Upravit</span>
             </button>
           </div>
           <div v-if="financeStore.budgets.length === 0" class="text-center py-8 text-gray-500">
@@ -160,9 +179,9 @@
           <div v-else class="space-y-3">
             <div v-for="budget in displayedBudgets" :key="budget.id">
               <div class="flex items-center justify-between mb-1">
-                <div class="flex items-center space-x-2">
-                  <CategoryIcon :category="budget.category" class="w-5 h-5" />
-                  <span class="text-sm font-medium text-gray-900">{{ getCategoryName(budget.category) }}</span>
+                <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <CategoryIcon :category="budget.category" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ getCategoryName(budget.category) }}</span>
                 </div>
                 <span class="text-sm text-gray-600">
                   {{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}
@@ -199,10 +218,10 @@
             <h3 class="text-lg font-semibold text-gray-900">Finanční cíle</h3>
             <button
               @click="openGoalSettings"
-              class="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+              class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
             >
-              <Settings class="w-4 h-4" />
-              Upravit
+              <Settings class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span class="hidden sm:inline">Upravit</span>
             </button>
           </div>
           <div v-if="financeStore.goals.length === 0" class="text-center py-8 text-gray-500">
@@ -242,15 +261,15 @@
       </div>
 
       <!-- Poslední transakce -->
-      <div class="card">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">Poslední transakce</h3>
+      <div class="card p-4 sm:p-5">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900">Poslední transakce</h3>
           <button
             @click="showAddTransactionModal = true"
-            class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-1"
+            class="text-xs sm:text-sm bg-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
           >
-            <Plus class="w-4 h-4" />
-            Přidat transakci
+            <Plus class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Přidat</span>
           </button>
         </div>
         <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-8 text-gray-500">
@@ -268,11 +287,11 @@
             v-for="transaction in financeStore.recentTransactions.slice(0, 10)"
             :key="transaction.id"
             @click="openEditTransaction(transaction)"
-            class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all cursor-pointer"
+            class="flex items-center justify-between p-3 sm:p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all cursor-pointer"
           >
-            <div class="flex items-center space-x-3 flex-1 min-w-0">
-              <div class="flex-shrink-0">
-                <p class="text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
+            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+              <div class="flex-shrink-0 hidden sm:block">
+                <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
               </div>
               <div
                 class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -518,13 +537,75 @@ const balanceChange = computed(() => {
   return financeStore.stats.monthlyIncome - financeStore.stats.monthlyExpenses
 })
 
-const incomeChange = ref(12.5)
-const expenseChange = ref(-5.3)
+// Vypočítá procentuální změnu příjmů oproti minulému měsíci
+const incomeChange = computed(() => {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+  
+  let currentMonthIncome = 0
+  let lastMonthIncome = 0
+  
+  financeStore.transactions
+    .filter(t => t.type === 'income')
+    .forEach(t => {
+      const date = new Date(t.date)
+      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+        currentMonthIncome += t.amount
+      } else if (date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear) {
+        lastMonthIncome += t.amount
+      }
+    })
+  
+  if (lastMonthIncome === 0) return 0
+  return ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100
+})
+
+// Vypočítá procentuální změnu výdajů oproti minulému měsíci
+const expenseChange = computed(() => {
+  const currentDate = new Date()
+  const currentMonth = currentDate.getMonth()
+  const currentYear = currentDate.getFullYear()
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+  
+  let currentMonthExpenses = 0
+  let lastMonthExpenses = 0
+  
+  financeStore.transactions
+    .filter(t => t.type === 'expense')
+    .forEach(t => {
+      const date = new Date(t.date)
+      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+        currentMonthExpenses += t.amount
+      } else if (date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear) {
+        lastMonthExpenses += t.amount
+      }
+    })
+  
+  if (lastMonthExpenses === 0) return 0
+  return ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
+})
 
 const savingsRate = computed(() => {
   if (financeStore.stats.monthlyIncome === 0) return 0
   const rate = ((financeStore.stats.monthlyIncome - financeStore.stats.monthlyExpenses) / financeStore.stats.monthlyIncome) * 100
   return Math.max(0, Math.min(100, rate))
+})
+
+// Celková bilance všech transakcí
+const totalBalance = computed(() => {
+  let total = 0
+  financeStore.transactions.forEach(t => {
+    if (t.type === 'income') {
+      total += t.amount
+    } else {
+      total -= t.amount
+    }
+  })
+  return total
 })
 
 // Data pro grafy
