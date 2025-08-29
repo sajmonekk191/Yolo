@@ -203,12 +203,34 @@ watch(() => form.type, () => {
   }
 })
 
+// Funkce pro konverzi data do formátu YYYY-MM-DD pro input
+const formatDateForInput = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+// Funkce pro naplnění formuláře
+const fillForm = () => {
+  if (props.transaction) {
+    form.type = props.transaction.type
+    form.amount = props.transaction.amount
+    form.description = props.transaction.description
+    form.category_id = props.transaction.category_id
+    form.date = formatDateForInput(props.transaction.date)
+  }
+}
+
+// Naplň formulář při mountu
 onMounted(() => {
-  // Naplň formulář daty z transakce
-  form.type = props.transaction.type
-  form.amount = props.transaction.amount
-  form.description = props.transaction.description
-  form.category_id = props.transaction.category_id
-  form.date = props.transaction.date
+  fillForm()
 })
+
+// Aktualizuj formulář když se změní transakce
+watch(() => props.transaction, () => {
+  fillForm()
+}, { immediate: true })
 </script>

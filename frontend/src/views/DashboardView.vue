@@ -237,18 +237,13 @@
       <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h3 class="text-lg font-semibold text-gray-900">Poslední transakce</h3>
-          <div class="flex items-center gap-2">
-            <button
-              @click="showAddTransactionModal = true"
-              class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-1"
-            >
-              <Plus class="w-4 h-4" />
-              Přidat transakci
-            </button>
-            <router-link to="/transakce" class="text-sm text-indigo-600 hover:text-indigo-500 font-medium">
-              Zobrazit vše
-            </router-link>
-          </div>
+          <button
+            @click="showAddTransactionModal = true"
+            class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-1"
+          >
+            <Plus class="w-4 h-4" />
+            Přidat transakci
+          </button>
         </div>
         <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-8 text-gray-500">
           <Receipt class="w-12 h-12 mx-auto mb-2 text-gray-300" />
@@ -264,7 +259,8 @@
           <div
             v-for="transaction in financeStore.recentTransactions.slice(0, 10)"
             :key="transaction.id"
-            class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all"
+            @click="openEditTransaction(transaction)"
+            class="flex items-center justify-between p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all cursor-pointer"
           >
             <div class="flex items-center space-x-3 flex-1 min-w-0">
               <div class="flex-shrink-0">
@@ -301,6 +297,14 @@
       v-if="showAddTransactionModal"
       @close="showAddTransactionModal = false"
       @transaction-added="handleTransactionAdded"
+    />
+
+    <!-- Modal pro editaci transakce -->
+    <EditTransactionModal
+      v-if="showEditTransactionModal"
+      :transaction="selectedTransaction"
+      @close="showEditTransactionModal = false"
+      @transaction-updated="handleTransactionUpdated"
     />
 
     <!-- Modal pro nastavení rozpočtů -->
@@ -459,6 +463,7 @@ import {
   DollarSign
 } from 'lucide-vue-next'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
+import EditTransactionModal from '@/components/EditTransactionModal.vue'
 import CategoryIcon from '@/components/CategoryIcon.vue'
 import LineChart from '@/components/LineChart.vue'
 import DoughnutChart from '@/components/DoughnutChart.vue'
@@ -467,6 +472,8 @@ const authStore = useAuthStore()
 const financeStore = useFinanceStore()
 
 const showAddTransactionModal = ref(false)
+const showEditTransactionModal = ref(false)
+const selectedTransaction = ref(null)
 const showBudgetSettings = ref(false)
 const showGoalSettings = ref(false)
 const trendPeriod = ref('6')
@@ -802,6 +809,16 @@ const openGoalSettings = () => {
 
 const handleTransactionAdded = () => {
   showAddTransactionModal.value = false
+}
+
+const openEditTransaction = (transaction) => {
+  selectedTransaction.value = transaction
+  showEditTransactionModal.value = true
+}
+
+const handleTransactionUpdated = () => {
+  showEditTransactionModal.value = false
+  selectedTransaction.value = null
 }
 
 // Nastaví dočasné vybrané rozpočty při otevření modalu
