@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Reset box-sizing pro všechny elementy */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+  }
+}
+
+/* Responzivní utility třídy */
+@layer utilities {
+  /* Force layout recalculation */
+  .force-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Responsive text utilities */
+  .text-responsive {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+  }
+  
+  /* Container responsivity fix */
+  .container-responsive {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-right: 1.5rem;
+      padding-left: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-right: 2rem;
+      padding-left: 2rem;
+    }
+  }
+}

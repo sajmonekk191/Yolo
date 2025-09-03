@@ -50,4 +50,29 @@ onMounted(() => {
     font-size: 16px; /* Zabránění zoomu na iOS */
   }
 }
+
+/* Force layout recalculation on resize */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Viewport meta fix for better responsive behavior */
+@supports (-webkit-touch-callout: none) {
+  /* iOS specific fixes */
+  .min-h-mobile {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Zajistí správné přepočítání při změně rozlišení */
+* {
+  transition: none !important;
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  * {
+    transition: all 0.2s ease-in-out !important;
+  }
+}
 </style>

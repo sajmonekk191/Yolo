@@ -462,7 +462,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFinanceStore } from '@/stores/finance'
 import {
@@ -507,6 +507,7 @@ const selectedBudgetIds = ref([])
 const tempSelectedBudgetIds = ref([])
 const selectedGoalIds = ref([])
 const tempSelectedGoalIds = ref([])
+const windowWidth = ref(window.innerWidth)
 
 const currentDate = computed(() => {
   return new Date().toLocaleDateString('cs-CZ', {
@@ -865,6 +866,17 @@ const updateTrendData = () => {
   // Tato funkce je zde jen pro případné budoucí rozšíření
 }
 
+// Funkce pro update velikosti okna s debounce
+let resizeTimeout = null
+const handleResize = () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    windowWidth.value = window.innerWidth
+    // Force re-render chart když se změní velikost
+    chartKey.value++
+  }, 150)
+}
+
 onMounted(() => {
   // Data se načtou automaticky v Layout komponentě
   
@@ -879,11 +891,52 @@ onMounted(() => {
   if (savedGoals) {
     selectedGoalIds.value = JSON.parse(savedGoals)
   }
+  
+  // Přidání resize listeneru
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  // Cleanup resize listener
+  window.removeEventListener('resize', handleResize)
+  if (resizeTimeout) {
+    clearTimeout(resizeTimeout)
+  }
 })
 </script>
 
 <style scoped>
 .card {
   @apply bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100;
+}
+
+/* Responzivní opravy pro různá rozlišení */
+@media screen and (max-width: 640px) {
+  /* Mobilní úpravy */
+  .card {
+    @apply p-3;
+  }
+}
+
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  /* Tablet úpravy */
+  .card {
+    @apply p-5;
+  }
+}
+
+/* Force recalculation on resize */
+* {
+  box-sizing: border-box;
+}
+
+/* Zajistí správné přepočítání flexboxu */
+.flex {
+  display: flex !important;
+}
+
+/* Zajistí správné přepočítání gridu */
+.grid {
+  display: grid !important;
 }
 </style>
