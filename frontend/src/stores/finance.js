@@ -13,6 +13,8 @@ export const useFinanceStore = defineStore('finance', {
       balance: 0,
       monthlyIncome: 0,
       monthlyExpenses: 0,
+      totalSavings: 0, // Součet peněz v cílech
+      availableBalance: 0, // Dostupný zůstatek (bez úspor)
     },
     isLoading: false,
     isTransactionsLoading: false,
@@ -49,6 +51,22 @@ export const useFinanceStore = defineStore('finance', {
     
     completedGoals: (state) => 
       state.goals.filter(g => g.is_completed),
+    
+    // Výpočty úspor a zůstatků
+    totalSavings: (state) => {
+      // Součet všech peněz v cílech
+      if (!state.goals || state.goals.length === 0) return 0
+      return state.goals.reduce((sum, goal) => sum + (goal.current_amount || 0), 0)
+    },
+    
+    availableBalance: (state) => {
+      // Skutečný dostupný zůstatek = celkový zůstatek - peníze v cílech
+      const income = state.stats?.totalIncome || 0
+      const expenses = state.stats?.totalExpenses || 0
+      const totalBalance = income - expenses
+      const savings = state.goals?.reduce((sum, goal) => sum + (goal.current_amount || 0), 0) || 0
+      return totalBalance - savings
+    },
     
     // Kategorie
     incomeCategories: (state) => 
@@ -128,9 +146,23 @@ export const useFinanceStore = defineStore('finance', {
     async fetchStats() {
       try {
         const response = await transactionsAPI.getStats()
-        this.stats = response.data
+        this.stats = {
+          totalIncome: response.data.total_income || 0,
+          totalExpenses: response.data.total_expenses || 0,
+          balance: response.data.balance || 0,
+          monthlyIncome: response.data.monthly_income || 0,
+          monthlyExpenses: response.data.monthly_expenses || 0,
+        }
       } catch (error) {
         console.error('Chyba při načítání statistik:', error)
+        // Nastavit default hodnoty při chybě
+        this.stats = {
+          totalIncome: 0,
+          totalExpenses: 0,
+          balance: 0,
+          monthlyIncome: 0,
+          monthlyExpenses: 0,
+        }
       }
     },
 
@@ -249,6 +281,64 @@ export const useFinanceStore = defineStore('finance', {
           success: false, 
           error: error.response?.data?.detail || 'Chyba při mazání cíle' 
         }
+      }
+    },
+
+    // Funkce pro přidání peněz do cíle (přesun z dostupného zůstatku)
+    async addMoneyToGoal(goalId, amount) {
+      try {
+        const goal = this.goals.find(g => g.id === goalId)
+        if (!goal) {
+          return { success: false, error: 'Cíl nenalezen' }
+        }
+        
+        // Zkontrolujeme, zda máme dostatek dostupných prostředků
+        const income = this.stats?.totalIncome || 0
+        const expenses = this.stats?.totalExpenses || 0
+        const totalBalance = income - expenses
+        const savings = this.goals?.reduce((sum, goal) => sum + (goal.current_amount || 0), 0) || 0
+        const availableBalance = totalBalance - savings
+        
+        if (availableBalance < amount) {
+          return { success: false, error: 'Nedostatek dostupných prostředků' }
+        }
+        
+        // Aktualizujeme cíl
+        const updatedGoal = {
+          ...goal,
+          current_amount: (goal.current_amount || 0) + amount
+        }
+        
+        return await this.updateGoal(goalId, updatedGoal)
+      } catch (error) {
+        console.error('Chyba při přidávání peněz do cíle:', error)
+        return { success: false, error: 'Chyba při přidávání peněz do cíle' }
+      }
+    },
+    
+    // Funkce pro výběr peněz z cíle (vrácení do dostupného zůstatku)
+    async withdrawFromGoal(goalId, amount) {
+      try {
+        const goal = this.goals.find(g => g.id === goalId)
+        if (!goal) {
+          return { success: false, error: 'Cíl nenalezen' }
+        }
+        
+        // Zkontrolujeme, zda v cíli je dostatek peněz
+        if ((goal.current_amount || 0) < amount) {
+          return { success: false, error: 'Nedostatek peněz v cíli' }
+        }
+        
+        // Aktualizujeme cíl
+        const updatedGoal = {
+          ...goal,
+          current_amount: (goal.current_amount || 0) - amount
+        }
+        
+        return await this.updateGoal(goalId, updatedGoal)
+      } catch (error) {
+        console.error('Chyba při výběru peněz z cíle:', error)
+        return { success: false, error: 'Chyba při výběru peněz z cíle' }
       }
     },
 

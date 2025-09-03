@@ -19,15 +19,15 @@
     <div v-else class="space-y-6">
       <!-- Finanční statistiky -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-        <!-- Celkový zůstatek -->
+        <!-- Dostupný zůstatek -->
         <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl sm:col-span-2 xl:col-span-1 relative overflow-hidden p-4 sm:p-5">
           <div class="absolute inset-0 bg-white opacity-5"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0">
-              <p class="text-indigo-100 text-[10px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">Celkový zůstatek</p>
-              <p class="text-xl sm:text-2xl lg:text-3xl font-bold truncate">{{ formatCurrency(totalBalance) }}</p>
+              <p class="text-indigo-100 text-[10px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">Dostupný zůstatek</p>
+              <p class="text-xl sm:text-2xl lg:text-3xl font-bold truncate">{{ formatCurrency(availableBalance) }}</p>
               <p class="text-xs text-indigo-100 mt-1 opacity-75">
-                {{ balanceChange >= 0 ? '+' : '' }}{{ formatCurrency(balanceChange) }} tento měsíc
+                Celkem: {{ formatCurrency(totalBalance) }} ({{ formatCurrency(totalSavings) }} v úsporách)
               </p>
             </div>
             <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-white bg-opacity-20 backdrop-blur rounded-xl flex items-center justify-center flex-shrink-0 ml-2 sm:ml-3">
@@ -42,13 +42,13 @@
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
               <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Příjmy</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats.monthlyIncome) }}</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyIncome || 0) }}</p>
               <div class="flex items-center mt-2">
                 <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium" 
                      :class="incomeChange >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
                   <TrendingUp v-if="incomeChange >= 0" class="w-3 h-3 mr-1" />
                   <TrendingDown v-else class="w-3 h-3 mr-1" />
-                  {{ incomeChange >= 0 ? '+' : '' }}{{ incomeChange.toFixed(1) }}%
+                  {{ incomeChange >= 0 ? '+' : '' }}{{ isNaN(incomeChange) ? '0.0' : incomeChange.toFixed(1) }}%
                 </div>
                 <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
@@ -65,13 +65,13 @@
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
               <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Výdaje</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats.monthlyExpenses) }}</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyExpenses || 0) }}</p>
               <div class="flex items-center mt-2">
                 <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium"
                      :class="expenseChange <= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
                   <TrendingDown v-if="expenseChange <= 0" class="w-3 h-3 mr-1" />
                   <TrendingUp v-else class="w-3 h-3 mr-1" />
-                  {{ expenseChange >= 0 ? '+' : '' }}{{ expenseChange.toFixed(1) }}%
+                  {{ expenseChange >= 0 ? '+' : '' }}{{ isNaN(expenseChange) ? '0.0' : expenseChange.toFixed(1) }}%
                 </div>
                 <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
@@ -87,23 +87,22 @@
           <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
-              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Úspory</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mt-1 truncate" 
-                 :class="balanceChange >= 0 ? 'text-gray-900' : 'text-red-600'">
-                {{ formatCurrency(balanceChange) }}
+              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Úspory v cílech</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mt-1 truncate text-gray-900">
+                {{ formatCurrency(totalSavings) }}
               </p>
               <div class="mt-3">
                 <div class="flex justify-between items-center mb-1">
-                  <span class="text-xs text-gray-500">Míra úspor</span>
+                  <span class="text-xs text-gray-500">Progress cílů</span>
                   <span class="text-xs font-semibold" 
-                        :class="savingsRate >= 20 ? 'text-emerald-600' : savingsRate >= 10 ? 'text-amber-600' : 'text-red-600'">
-                    {{ savingsRate.toFixed(1) }}%
+                        :class="savingsRate >= 75 ? 'text-emerald-600' : savingsRate >= 50 ? 'text-amber-600' : 'text-red-600'">
+                    {{ isNaN(savingsRate) ? '0.0' : savingsRate.toFixed(1) }}%
                   </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
                   <div class="h-2 rounded-full transition-all duration-500 ease-out"
-                       :class="savingsRate >= 20 ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 
-                               savingsRate >= 10 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 
+                       :class="savingsRate >= 75 ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 
+                               savingsRate >= 50 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 
                                'bg-gradient-to-r from-red-400 to-rose-400'"
                        :style="{ width: `${Math.min(savingsRate, 100)}%` }">
                   </div>
@@ -533,13 +532,16 @@ const displayedGoals = computed(() => {
   return activeGoals.filter(g => selectedGoalIds.value.includes(g.id))
 })
 
-// Simulované hodnoty změn
-const balanceChange = computed(() => {
-  return financeStore.stats.monthlyIncome - financeStore.stats.monthlyExpenses
+// Úspory = součet peněz v cílech
+const totalSavings = computed(() => {
+  if (!financeStore.goals) return 0
+  return financeStore.goals.reduce((sum, goal) => sum + (goal.current_amount || 0), 0)
 })
 
 // Vypočítá procentuální změnu příjmů oproti minulému měsíci
 const incomeChange = computed(() => {
+  if (!financeStore.transactions || financeStore.transactions.length === 0) return 0
+  
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
@@ -550,22 +552,27 @@ const incomeChange = computed(() => {
   let lastMonthIncome = 0
   
   financeStore.transactions
-    .filter(t => t.type === 'income')
+    .filter(t => t.type === 'INCOME' || t.type === 'income')
     .forEach(t => {
       const date = new Date(t.date)
       if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-        currentMonthIncome += t.amount
+        currentMonthIncome += parseFloat(t.amount) || 0
       } else if (date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear) {
-        lastMonthIncome += t.amount
+        lastMonthIncome += parseFloat(t.amount) || 0
       }
     })
   
+  // Pokud nemáme data z minulého měsíce ale máme tento měsíc, ukážeme 100%
+  if (lastMonthIncome === 0 && currentMonthIncome > 0) return 100
   if (lastMonthIncome === 0) return 0
+  
   return ((currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100
 })
 
 // Vypočítá procentuální změnu výdajů oproti minulému měsíci
 const expenseChange = computed(() => {
+  if (!financeStore.transactions || financeStore.transactions.length === 0) return 0
+  
   const currentDate = new Date()
   const currentMonth = currentDate.getMonth()
   const currentYear = currentDate.getFullYear()
@@ -576,37 +583,60 @@ const expenseChange = computed(() => {
   let lastMonthExpenses = 0
   
   financeStore.transactions
-    .filter(t => t.type === 'expense')
+    .filter(t => t.type === 'EXPENSE' || t.type === 'expense')
     .forEach(t => {
       const date = new Date(t.date)
       if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-        currentMonthExpenses += t.amount
+        currentMonthExpenses += parseFloat(t.amount) || 0
       } else if (date.getMonth() === lastMonth && date.getFullYear() === lastMonthYear) {
-        lastMonthExpenses += t.amount
+        lastMonthExpenses += parseFloat(t.amount) || 0
       }
     })
   
+  // Pokud nemáme data z minulého měsíce ale máme tento měsíc, ukážeme 100%
+  if (lastMonthExpenses === 0 && currentMonthExpenses > 0) return 100
   if (lastMonthExpenses === 0) return 0
+  
   return ((currentMonthExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
 })
 
 const savingsRate = computed(() => {
-  if (financeStore.stats.monthlyIncome === 0) return 0
-  const rate = ((financeStore.stats.monthlyIncome - financeStore.stats.monthlyExpenses) / financeStore.stats.monthlyIncome) * 100
-  return Math.max(0, Math.min(100, rate))
-})
-
-// Celková bilance všech transakcí
-const totalBalance = computed(() => {
-  let total = 0
-  financeStore.transactions.forEach(t => {
-    if (t.type === 'income') {
-      total += t.amount
-    } else {
-      total -= t.amount
+  // Průměrný progress všech cílů
+  if (!financeStore.goals || financeStore.goals.length === 0) return 0
+  
+  let totalProgress = 0
+  let validGoals = 0
+  
+  financeStore.goals.forEach(goal => {
+    if (goal.target_amount > 0) {
+      const progress = (goal.current_amount / goal.target_amount) * 100
+      totalProgress += Math.min(progress, 100) // Omezíme na 100% pro přeplněné cíle
+      validGoals++
     }
   })
-  return total
+  
+  if (validGoals === 0) return 0
+  
+  // Průměrný progress
+  const averageProgress = totalProgress / validGoals
+  return Math.max(0, Math.min(100, averageProgress))
+})
+
+// Dostupný zůstatek (bez peněz v cílech) 
+const availableBalance = computed(() => {
+  // Všechny příjmy mínus výdaje mínus peníze v cílech
+  const income = financeStore.stats?.totalIncome || 0
+  const expenses = financeStore.stats?.totalExpenses || 0
+  const savings = totalSavings.value || 0
+  return income - expenses - savings
+})
+
+// Celkový zůstatek (včetně úspor)
+const totalBalance = computed(() => {
+  // Všechny příjmy mínus výdaje (včetně úspor)
+  const income = financeStore.stats?.totalIncome || 0
+  const expenses = financeStore.stats?.totalExpenses || 0
+  return income - expenses
 })
 
 // Data pro grafy
@@ -640,10 +670,11 @@ const trendChartData = computed(() => {
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
     
     if (monthlyData[key]) {
-      if (transaction.type === 'income') {
-        monthlyData[key].income += transaction.amount
-      } else {
-        monthlyData[key].expenses += transaction.amount
+      const amount = parseFloat(transaction.amount) || 0
+      if (transaction.type === 'INCOME' || transaction.type === 'income') {
+        monthlyData[key].income += amount
+      } else if (transaction.type === 'EXPENSE' || transaction.type === 'expense') {
+        monthlyData[key].expenses += amount
       }
     }
   })

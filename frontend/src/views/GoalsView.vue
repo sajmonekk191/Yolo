@@ -138,14 +138,24 @@
               </div>
             </div>
 
-            <!-- Tlačítko pro přidání částky -->
-            <button
-              @click="addToGoal(goal)"
-              class="w-full mt-4 btn-secondary flex items-center justify-center space-x-2"
-            >
-              <Plus class="w-4 h-4" />
-              <span>Přidat částku</span>
-            </button>
+            <!-- Tlačítka pro přidání/výběr částky -->
+            <div class="flex gap-2 mt-4">
+              <button
+                @click="addToGoal(goal)"
+                class="flex-1 btn-secondary flex items-center justify-center space-x-1 py-2"
+              >
+                <Plus class="w-4 h-4" />
+                <span>Vložit</span>
+              </button>
+              <button
+                v-if="goal.current_amount > 0"
+                @click="withdrawFromGoal(goal)"
+                class="flex-1 btn-secondary flex items-center justify-center space-x-1 py-2"
+              >
+                <Minus class="w-4 h-4" />
+                <span>Vybrat</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -227,6 +237,13 @@
       @close="closeDeleteModal"
       @confirm="handleDeleteConfirm"
     />
+
+    <WithdrawFromGoalModal
+      v-if="showWithdrawModal && selectedGoal"
+      :goal="selectedGoal"
+      @close="closeWithdrawModal"
+      @withdrawn="handleWithdrawn"
+    />
   </div>
 </template>
 
@@ -235,6 +252,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useFinanceStore } from '@/stores/finance'
 import {
   Plus,
+  Minus,
   Target,
   CheckCircle,
   TrendingUp,
@@ -246,6 +264,7 @@ import AddGoalModal from '@/components/AddGoalModal.vue'
 import EditGoalModal from '@/components/EditGoalModal.vue'
 import AddToGoalModal from '@/components/AddToGoalModal.vue'
 import DeleteConfirmModal from '@/components/DeleteConfirmModal.vue'
+import WithdrawFromGoalModal from '@/components/WithdrawFromGoalModal.vue'
 
 const financeStore = useFinanceStore()
 
@@ -253,6 +272,7 @@ const showAddModal = ref(false)
 const showEditModal = ref(false)
 const showAddToGoalModal = ref(false)
 const showDeleteModal = ref(false)
+const showWithdrawModal = ref(false)
 const selectedGoal = ref(null)
 
 const totalGoalAmount = computed(() => {
@@ -317,6 +337,11 @@ const addToGoal = (goal) => {
   showAddToGoalModal.value = true
 }
 
+const withdrawFromGoal = (goal) => {
+  selectedGoal.value = goal
+  showWithdrawModal.value = true
+}
+
 const closeEditModal = () => {
   showEditModal.value = false
   selectedGoal.value = null
@@ -332,6 +357,11 @@ const closeAddToGoalModal = () => {
   selectedGoal.value = null
 }
 
+const closeWithdrawModal = () => {
+  showWithdrawModal.value = false
+  selectedGoal.value = null
+}
+
 const handleGoalAdded = () => {
   showAddModal.value = false
 }
@@ -342,6 +372,10 @@ const handleGoalUpdated = () => {
 
 const handleAmountAdded = () => {
   closeAddToGoalModal()
+}
+
+const handleWithdrawn = () => {
+  closeWithdrawModal()
 }
 
 const handleDeleteConfirm = async () => {
