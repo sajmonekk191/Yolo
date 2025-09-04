@@ -11,7 +11,7 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => !!state.token && !!state.user,
-    userName: (state) => state.user?.name || '',
+    userName: (state) => state.user?.username || state.user?.name || '',
     userEmail: (state) => state.user?.email || '',
   },
 
@@ -66,6 +66,10 @@ export const useAuthStore = defineStore('auth', {
       try {
         const response = await authAPI.getCurrentUser()
         this.user = response.data
+        // Uložit user data do localStorage
+        if (this.user) {
+          localStorage.setItem('user', JSON.stringify(this.user))
+        }
       } catch (error) {
         console.error('Chyba při ověřování uživatele:', error)
         this.logout()
@@ -82,19 +86,28 @@ export const useAuthStore = defineStore('auth', {
     },
 
     // Načtení uživatele z localStorage při startu
-    initializeAuth() {
+    async initializeAuth() {
       const savedUser = localStorage.getItem('user')
       const savedToken = localStorage.getItem('token')
       
-      if (savedUser && savedToken) {
-        try {
-          this.user = JSON.parse(savedUser)
-          this.token = savedToken
-        } catch (error) {
-          console.error('Chyba při načítání uložených dat:', error)
-          this.logout()
+      if (savedToken) {
+        this.token = savedToken
+        
+        if (savedUser) {
+          try {
+            this.user = JSON.parse(savedUser)
+          } catch (error) {
+            console.error('Chyba při načítání uložených dat:', error)
+          }
+        }
+        
+        // Pokud nemáme user data ale máme token, načteme je z API
+        if (!this.user) {
+          await this.checkAuth()
         }
       }
+      
+      this.isInitialized = true
     },
   },
 })

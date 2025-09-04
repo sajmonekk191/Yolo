@@ -30,8 +30,10 @@ export const useFinanceStore = defineStore('finance', {
     expenseTransactions: (state) => 
       state.transactions.filter(t => t.type === 'expense'),
     
-    recentTransactions: (state) => 
-      state.transactions.slice(0, 10),
+    recentTransactions: (state) => {
+      // Transakce jsou již seřazené v fetchTransactions, jen vezmeme prvních 10
+      return state.transactions.slice(0, 10)
+    },
     
     // Rozpočty
     activeBudgets: (state) => 
@@ -82,7 +84,12 @@ export const useFinanceStore = defineStore('finance', {
       this.isTransactionsLoading = true
       try {
         const response = await transactionsAPI.getAll(params)
-        this.transactions = response.data
+        // Seřadit transakce podle data sestupně (nejnovější první)
+        this.transactions = response.data.sort((a, b) => {
+          const dateA = new Date(a.date)
+          const dateB = new Date(b.date)
+          return dateB - dateA // Sestupně (nejnovější první)
+        })
       } catch (error) {
         console.error('Chyba při načítání transakcí:', error)
         throw error

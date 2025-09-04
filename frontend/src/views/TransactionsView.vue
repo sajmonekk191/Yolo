@@ -340,6 +340,7 @@ const filters = reactive({
 })
 
 const filteredTransactions = computed(() => {
+  // Transakce jsou již seřazené ze store (nejnovější první)
   let transactions = [...financeStore.transactions]
 
   // Filtrování podle vyhledávání
@@ -365,8 +366,8 @@ const filteredTransactions = computed(() => {
     transactions = transactions.filter(t => t.date >= filters.dateFrom)
   }
 
-  // Řazení podle data (nejnovější první)
-  return transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
+  // Transakce jsou již seřazené ze store, není potřeba znovu řadit
+  return transactions
 })
 
 const totalPages = computed(() => {
