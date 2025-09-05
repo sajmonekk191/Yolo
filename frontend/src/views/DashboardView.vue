@@ -286,28 +286,37 @@
             v-for="transaction in financeStore.recentTransactions.slice(0, 10)"
             :key="transaction.id"
             @click="openEditTransaction(transaction)"
-            class="flex items-center justify-between p-3 sm:p-4 rounded-lg border border-gray-100 hover:border-indigo-200 hover:bg-gray-50 transition-all cursor-pointer"
+            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group"
           >
-            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-              <div class="flex-shrink-0 hidden sm:block">
-                <p class="text-xs sm:text-sm text-gray-500">{{ formatDate(transaction.date) }}</p>
-              </div>
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <!-- Ikona kategorie -->
               <div
-                class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
                 :class="transaction.type === 'income' 
-                  ? 'bg-gradient-to-br from-emerald-400 to-teal-400' 
-                  : 'bg-gradient-to-br from-rose-400 to-pink-400'"
+                  ? 'bg-gradient-to-br from-emerald-500 to-green-600' 
+                  : 'bg-gradient-to-br from-rose-400 to-pink-500'"
               >
-                <CategoryIcon :category="transaction.category" class="w-5 h-5 text-white" />
+                <component
+                  :is="getTransactionIcon(transaction)"
+                  class="w-5 h-5 text-white"
+                />
               </div>
-              <div class="flex-1 min-w-0 ml-2">
-                <p class="text-sm font-medium text-gray-900">{{ transaction.description }}</p>
-                <p class="text-xs text-gray-500">{{ transaction.category }}</p>
+              
+              <!-- Popis a kategorie -->
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ transaction.description }}</p>
+                <div class="flex items-center gap-2 mt-0.5">
+                  <span class="text-xs text-gray-500">{{ getTransactionCategoryName(transaction) }}</span>
+                  <span class="text-xs text-gray-400">•</span>
+                  <span class="text-xs text-gray-500">{{ formatRelativeDate(transaction.date) }}</span>
+                </div>
               </div>
             </div>
+            
+            <!-- Částka -->
             <div class="text-right flex-shrink-0 ml-4">
               <p
-                class="text-lg font-semibold"
+                class="text-base font-bold"
                 :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
               >
                 {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
@@ -485,7 +494,16 @@ import {
   Gift,
   Trophy,
   Briefcase,
-  DollarSign
+  DollarSign,
+  ShoppingCart,
+  Music,
+  Utensils,
+  Dumbbell,
+  Shield,
+  Zap,
+  CreditCard,
+  MoreHorizontal,
+  Shirt
 } from 'lucide-vue-next'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import EditTransactionModal from '@/components/EditTransactionModal.vue'
@@ -862,8 +880,11 @@ const openGoalSettings = () => {
   showGoalSettings.value = true
 }
 
-const handleTransactionAdded = () => {
+const handleTransactionAdded = async () => {
   showAddTransactionModal.value = false
+  // Načteme znovu transakce pro zobrazení nově přidané
+  await financeStore.fetchTransactions()
+  await financeStore.fetchStats()
   // Vynutíme re-render grafu změnou key
   chartKey.value++
 }
@@ -873,9 +894,12 @@ const openEditTransaction = (transaction) => {
   showEditTransactionModal.value = true
 }
 
-const handleTransactionUpdated = () => {
+const handleTransactionUpdated = async () => {
   showEditTransactionModal.value = false
   selectedTransaction.value = null
+  // Načteme znovu transakce pro zobrazení aktualizované
+  await financeStore.fetchTransactions()
+  await financeStore.fetchStats()
   // Vynutíme re-render grafu změnou key
   chartKey.value++
 }
@@ -890,6 +914,74 @@ watch(() => financeStore.transactions, () => {
 const openBudgetSettings = () => {
   tempSelectedBudgetIds.value = [...selectedBudgetIds.value]
   showBudgetSettings.value = true
+}
+
+// Helper funkce pro zobrazení dat transakcí
+const getTransactionIcon = (transaction) => {
+  // Pokud má transakce info o kategorii s ikonou
+  if (transaction.category && transaction.category.icon) {
+    const iconName = transaction.category.icon
+    // Mapování ikon podle názvu
+    switch(iconName) {
+      case 'Banknote': return DollarSign
+      case 'Briefcase': return Briefcase
+      case 'TrendingUp': return TrendingUp
+      case 'Gift': return Gift
+      case 'Wallet': return Wallet
+      case 'ShoppingCart': return ShoppingCart
+      case 'Home': return Home
+      case 'Car': return Car
+      case 'Heart': return Heart
+      case 'Plane': return Plane
+      case 'GraduationCap': return GraduationCap
+      case 'Smartphone': return Smartphone
+      case 'Shirt': return Shirt
+      case 'Music': return Music
+      case 'Utensils': return Utensils
+      case 'Dumbbell': return Dumbbell
+      case 'Shield': return Shield
+      case 'Zap': return Zap
+      case 'CreditCard': return CreditCard
+      case 'MoreHorizontal': return MoreHorizontal
+      default: return transaction.type === 'income' ? TrendingUp : TrendingDown
+    }
+  }
+  // Fallback na základní ikony podle typu
+  return transaction.type === 'income' ? TrendingUp : TrendingDown
+}
+
+const getTransactionCategoryName = (transaction) => {
+  // Pokud transakce má přímo informaci o kategorii
+  if (transaction.category && transaction.category.name) {
+    return transaction.category.name
+  }
+  // Jinak zkus najít v seznamu kategorií
+  const category = financeStore.categories.find(c => c.id === transaction.category_id)
+  return category ? category.name : 'Neznámá kategorie'
+}
+
+const formatRelativeDate = (dateString) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  
+  // Reset času pro správné porovnání dnů
+  now.setHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
+  
+  const diffTime = now - date
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+  
+  if (diffDays === 0) return 'Dnes'
+  if (diffDays === 1) return 'Včera'
+  if (diffDays === 2) return 'Předevčírem'
+  if (diffDays > 0 && diffDays <= 7) return `Před ${diffDays} dny`
+  if (diffDays > 7 && diffDays <= 30) {
+    const weeks = Math.floor(diffDays / 7)
+    return weeks === 1 ? 'Před týdnem' : `Před ${weeks} týdny`
+  }
+  if (diffDays < 0) return 'Budoucí datum'
+  
+  return new Date(dateString).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short' })
 }
 
 const updateTrendData = () => {

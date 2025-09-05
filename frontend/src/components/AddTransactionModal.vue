@@ -167,12 +167,15 @@ const handleSubmit = async () => {
   isLoading.value = true
 
   try {
+    // Přidáme aktuální čas k datu pro správné zobrazení
+    const transactionDate = new Date(form.date + 'T' + new Date().toTimeString().slice(0, 8))
+    
     const result = await financeStore.createTransaction({
       type: form.type,
       amount: parseFloat(form.amount),
       description: form.description,
       category_id: parseInt(form.category_id),
-      date: form.date
+      date: transactionDate.toISOString()
     })
 
     if (result.success) {

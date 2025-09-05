@@ -84,12 +84,8 @@ export const useFinanceStore = defineStore('finance', {
       this.isTransactionsLoading = true
       try {
         const response = await transactionsAPI.getAll(params)
-        // Seřadit transakce podle data sestupně (nejnovější první)
-        this.transactions = response.data.sort((a, b) => {
-          const dateA = new Date(a.date)
-          const dateB = new Date(b.date)
-          return dateB - dateA // Sestupně (nejnovější první)
-        })
+        // Backend už vrací seřazené podle ID sestupně, nepotřebujeme řadit znovu
+        this.transactions = response.data
       } catch (error) {
         console.error('Chyba při načítání transakcí:', error)
         throw error

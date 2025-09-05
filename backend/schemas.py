@@ -44,6 +44,7 @@ class Transaction(TransactionBase):
     id: int
     user_id: int
     created_at: datetime
+    category: Optional[dict] = None  # Přidáno pro informace o kategorii
     
     class Config:
         from_attributes = True

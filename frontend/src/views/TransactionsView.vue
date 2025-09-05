@@ -144,7 +144,7 @@
               </div>
               <div class="flex-1 min-w-0">
                 <p class="font-medium text-gray-900 text-sm truncate">{{ transaction.description }}</p>
-                <p class="text-xs text-gray-500">{{ getCategoryName(transaction.category_id) }}</p>
+                <p class="text-xs text-gray-500">{{ getCategoryName(transaction) }}</p>
               </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -214,7 +214,7 @@
                 </div>
               </td>
               <td class="py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-gray-600 hidden sm:table-cell">
-                {{ getCategoryName(transaction.category_id) }}
+                {{ getCategoryName(transaction) }}
               </td>
               <td class="py-2 sm:py-3 px-3 sm:px-4">
                 <span
@@ -392,8 +392,13 @@ const totalExpenses = computed(() => {
     .reduce((sum, t) => sum + t.amount, 0)
 })
 
-const getCategoryName = (categoryId) => {
-  const category = financeStore.categories.find(c => c.id === categoryId)
+const getCategoryName = (transaction) => {
+  // Pokud transakce má přímo informaci o kategorii, použij ji
+  if (transaction.category && transaction.category.name) {
+    return transaction.category.name
+  }
+  // Jinak zkus najít v seznamu kategorií
+  const category = financeStore.categories.find(c => c.id === transaction.category_id)
   return category ? category.name : 'Neznámá kategorie'
 }
 

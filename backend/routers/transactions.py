@@ -1,13 +1,18 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 from database import get_db
 import models
 import schemas
 import auth
+from .categories import CATEGORIES
 
 router = APIRouter()
+
+def get_category_info(category_id: int) -> Optional[Dict[str, Any]]:
+    """Helper function to get category information"""
+    return next((cat for cat in CATEGORIES if cat["id"] == category_id), None)
 
 @router.post("/", response_model=schemas.Transaction)
 async def create_transaction(
@@ -15,8 +20,15 @@ async def create_transaction(
     current_user: models.User = Depends(auth.get_current_active_user),
     db: Session = Depends(get_db)
 ):
+    # Zpracovat datum správně - pokud není čas, použít aktuální čas v lokální zóně
+    transaction_data = transaction.dict()
+    if transaction_data.get('date'):
+        # Pokud je datum string bez času, přidáme aktuální čas
+        if isinstance(transaction_data['date'], str):
+            transaction_data['date'] = datetime.fromisoformat(transaction_data['date'])
+    
     db_transaction = models.Transaction(
-        **transaction.dict(),
+        **transaction_data,
         user_id=current_user.id
     )
     db.add(db_transaction)
@@ -36,7 +48,12 @@ async def create_transaction(
     
     db.commit()
     db.refresh(db_transaction)
-    return db_transaction
+    
+    # Přidat informace o kategorii
+    result = schemas.Transaction.model_validate(db_transaction)
+    if db_transaction.category_id:
+        result.category = get_category_info(db_transaction.category_id)
+    return result
 
 @router.get("/", response_model=List[schemas.Transaction])
 async def read_transactions(
@@ -60,8 +77,17 @@ async def read_transactions(
     if end_date:
         query = query.filter(models.Transaction.date <= end_date)
     
-    transactions = query.order_by(models.Transaction.date.desc()).offset(skip).limit(limit).all()
-    return transactions
+    transactions = query.order_by(models.Transaction.id.desc()).offset(skip).limit(limit).all()
+    
+    # Přidat informace o kategorii ke každé transakci
+    result = []
+    for transaction in transactions:
+        trans_dict = schemas.Transaction.model_validate(transaction)
+        if transaction.category_id:
+            trans_dict.category = get_category_info(transaction.category_id)
+        result.append(trans_dict)
+    
+    return result
 
 @router.get("/{transaction_id}", response_model=schemas.Transaction)
 async def read_transaction(
@@ -75,7 +101,12 @@ async def read_transaction(
     ).first()
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-    return transaction
+    
+    # Přidat informace o kategorii
+    result = schemas.Transaction.model_validate(transaction)
+    if transaction.category_id:
+        result.category = get_category_info(transaction.category_id)
+    return result
 
 @router.put("/{transaction_id}", response_model=schemas.Transaction)
 async def update_transaction(
@@ -96,7 +127,12 @@ async def update_transaction(
     
     db.commit()
     db.refresh(transaction)
-    return transaction
+    
+    # Přidat informace o kategorii
+    result = schemas.Transaction.model_validate(transaction)
+    if transaction.category_id:
+        result.category = get_category_info(transaction.category_id)
+    return result
 
 @router.delete("/{transaction_id}")
 async def delete_transaction(
