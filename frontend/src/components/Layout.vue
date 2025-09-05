@@ -1,14 +1,14 @@
 <template>
-  <div class="min-h-mobile safe-top safe-bottom bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <div class="min-h-mobile safe-top safe-bottom bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-black transition-colors duration-300">
     <!-- Bottom Navigation pro mobily -->
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-bottom z-50">
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 safe-bottom z-50 transition-colors duration-300">
       <div class="grid grid-cols-4 gap-1 px-2 py-1">
         <router-link
           v-for="item in navigation"
           :key="item.name"
           :to="item.to"
-          class="flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-colors"
-          :class="$route.name === item.name ? 'text-blue-600' : 'text-gray-500'"
+          class="flex flex-col items-center justify-center py-2 px-1 rounded-lg transition-all duration-200"
+          :class="$route.name === item.name ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'"
         >
           <component 
             :is="item.icon" 
@@ -23,14 +23,14 @@
     <div class="flex">
       <!-- Sidebar -->
       <div class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0">
-        <div class="flex flex-col flex-grow bg-white shadow-sm border-r border-gray-200">
+        <div class="flex flex-col flex-grow bg-white dark:bg-gray-900 shadow-sm border-r border-gray-200 dark:border-gray-800 transition-colors duration-300">
           <!-- Logo -->
-          <div class="flex items-center px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-center px-6 py-4 border-b border-gray-200 dark:border-gray-800">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <TrendingUp class="w-5 h-5 text-white" />
               </div>
-              <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
                 Yolo Finance
               </h1>
             </div>
@@ -43,21 +43,43 @@
                 v-for="item in navigation"
                 :key="item.name"
                 :to="item.to"
-                class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors group"
-                :class="{ 'bg-blue-50 text-blue-700': $route.name === item.name }"
+                class="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 group"
+                :class="{ 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400': $route.name === item.name }"
               >
                 <component 
                   :is="item.icon" 
                   class="w-5 h-5 transition-colors"
-                  :class="$route.name === item.name ? 'text-blue-600' : 'text-gray-500 group-hover:text-gray-700'"
+                  :class="$route.name === item.name ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'"
                 />
                 <span class="font-medium">{{ item.label }}</span>
               </router-link>
             </div>
           </nav>
 
+          <!-- Dark Mode Toggle -->
+          <div class="px-4 pb-3 pt-2">
+            <button
+              @click="toggleDarkMode"
+              class="flex items-center justify-between w-full px-3 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 group"
+            >
+              <div class="flex items-center space-x-3">
+                <Sun v-if="!isDarkMode" class="w-5 h-5 text-yellow-500" />
+                <Moon v-else class="w-5 h-5 text-blue-400" />
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {{ isDarkMode ? 'Tmavý režim' : 'Světlý režim' }}
+                </span>
+              </div>
+              <div class="w-12 h-6 bg-gray-300 dark:bg-gray-600 rounded-full relative transition-colors duration-200">
+                <div 
+                  class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200"
+                  :class="isDarkMode ? 'translate-x-6' : 'translate-x-0.5'"
+                ></div>
+              </div>
+            </button>
+          </div>
+
           <!-- Uživatelské menu -->
-          <div class="px-4 py-4 border-t border-gray-200">
+          <div class="px-4 py-4 border-t border-gray-200 dark:border-gray-800">
             <div class="flex items-center space-x-3 mb-3">
               <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
                 <span class="text-sm font-medium text-white">
@@ -65,17 +87,17 @@
                 </span>
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {{ authStore.userName }}
                 </p>
-                <p class="text-sm text-gray-500 truncate">
+                <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
                   {{ authStore.userEmail }}
                 </p>
               </div>
             </div>
             <button
               @click="logout"
-              class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              class="flex items-center space-x-3 w-full px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
             >
               <LogOut class="w-5 h-5" />
               <span>Odhlásit se</span>
@@ -87,19 +109,29 @@
       <!-- Hlavní obsah -->
       <div class="lg:pl-64 flex-1">
         <!-- Mobilní header -->
-        <div class="lg:hidden bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-          <div class="px-3 sm:px-4 py-2 flex items-center justify-between">
+        <div class="lg:hidden bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800 sticky top-0 z-40 transition-colors duration-300">
+          <div class="px-3 sm:px-4 py-2.5 flex items-center justify-between">
             <div class="flex items-center space-x-2">
               <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <TrendingUp class="w-5 h-5 text-white" />
               </div>
-              <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 class="text-base sm:text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
                 Yolo Finance
               </h1>
             </div>
-            <button @click="logout" class="p-2 -mr-2 rounded-lg hover:bg-gray-100 active:bg-gray-200">
-              <LogOut class="w-5 h-5 text-gray-600" />
-            </button>
+            <div class="flex items-center space-x-1">
+              <!-- Dark Mode Toggle Mobile -->
+              <button
+                @click="toggleDarkMode"
+                class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <Sun v-if="!isDarkMode" class="w-5 h-5 text-yellow-500" />
+                <Moon v-else class="w-5 h-5 text-blue-400" />
+              </button>
+              <button @click="logout" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200">
+                <LogOut class="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -119,18 +151,24 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFinanceStore } from '@/stores/finance'
+import { useDarkMode } from '@/composables/useDarkMode'
 import {
   Home,
   ArrowUpDown,
   Target,
   PiggyBank,
   TrendingUp,
-  LogOut
+  LogOut,
+  Sun,
+  Moon
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const financeStore = useFinanceStore()
+
+// Dark mode
+const { isDarkMode, toggleDarkMode, initDarkMode } = useDarkMode()
 
 // Odstranění nepotřebné reference pro mobilní menu
 // const isMobileMenuOpen = ref(false)
@@ -182,6 +220,9 @@ const logout = async () => {
 }
 
 onMounted(() => {
+  // Inicializace dark mode
+  initDarkMode()
+  
   // Inicializace finančních dat při načtení layout
   financeStore.initializeData()
 })

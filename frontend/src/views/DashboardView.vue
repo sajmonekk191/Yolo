@@ -3,10 +3,10 @@
     <!-- Nadpis -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Přehled</h1>
-        <p class="text-sm sm:text-base text-gray-600">Vítejte zpět, {{ authStore.userName }}!</p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Přehled</h1>
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">Vítejte zpět, {{ authStore.userName }}!</p>
       </div>
-      <div class="text-xs sm:text-sm text-gray-500">
+      <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-500">
         {{ currentDate }}
       </div>
     </div>
@@ -20,8 +20,8 @@
       <!-- Finanční statistiky -->
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         <!-- Dostupný zůstatek -->
-        <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl sm:col-span-2 xl:col-span-1 relative overflow-hidden p-4 sm:p-5">
-          <div class="absolute inset-0 bg-white opacity-5"></div>
+        <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 text-white shadow-xl sm:col-span-2 xl:col-span-1 relative overflow-hidden p-4 sm:p-5">
+          <div class="absolute inset-0 bg-white dark:bg-black opacity-5"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0">
               <p class="text-indigo-100 text-[10px] sm:text-xs font-medium opacity-90 uppercase tracking-wider">Dostupný zůstatek</p>
@@ -37,69 +37,69 @@
         </div>
 
         <!-- Měsíční příjmy -->
-        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow p-4 sm:p-5">
-          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+        <div class="card dark:bg-gray-800 relative overflow-hidden border-0 dark:border dark:border-gray-700 shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-emerald-100 to-teal-100 dark:from-emerald-900 dark:to-teal-900 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50 dark:opacity-30"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
-              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Příjmy</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyIncome || 0) }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Příjmy</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 dark:text-white mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyIncome || 0) }}</p>
               <div class="flex items-center mt-2">
                 <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium" 
-                     :class="incomeChange >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+                     :class="incomeChange >= 0 ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'">
                   <TrendingUp v-if="incomeChange >= 0" class="w-3 h-3 mr-1" />
                   <TrendingDown v-else class="w-3 h-3 mr-1" />
                   {{ incomeChange >= 0 ? '+' : '' }}{{ isNaN(incomeChange) ? '0.0' : incomeChange.toFixed(1) }}%
                 </div>
-                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
+                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
             </div>
-            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-emerald-500 to-teal-500 dark:from-emerald-600 dark:to-teal-600 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg dark:shadow-emerald-900/50">
               <TrendingUp class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
         </div>
 
         <!-- Měsíční výdaje -->
-        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow p-4 sm:p-5">
-          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-rose-100 to-pink-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+        <div class="card dark:bg-gray-800 relative overflow-hidden border-0 dark:border dark:border-gray-700 shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900 dark:to-pink-900 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50 dark:opacity-30"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
-              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Výdaje</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyExpenses || 0) }}</p>
+              <p class="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Výdaje</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 dark:text-white mt-1 truncate">{{ formatCurrency(financeStore.stats?.monthlyExpenses || 0) }}</p>
               <div class="flex items-center mt-2">
                 <div class="flex items-center px-2 py-1 rounded-full text-xs font-medium"
-                     :class="expenseChange <= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'">
+                     :class="expenseChange <= 0 ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'">
                   <TrendingDown v-if="expenseChange <= 0" class="w-3 h-3 mr-1" />
                   <TrendingUp v-else class="w-3 h-3 mr-1" />
                   {{ expenseChange >= 0 ? '+' : '' }}{{ isNaN(expenseChange) ? '0.0' : expenseChange.toFixed(1) }}%
                 </div>
-                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 hidden sm:inline">vs minulý měsíc</span>
+                <span class="ml-1 sm:ml-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-500 hidden sm:inline">vs minulý měsíc</span>
               </div>
             </div>
-            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-rose-500 to-pink-500 dark:from-rose-600 dark:to-pink-600 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg dark:shadow-rose-900/50">
               <TrendingDown class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
         </div>
 
         <!-- Úspory -->
-        <div class="card relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-shadow sm:col-span-2 xl:col-span-1 p-4 sm:p-5">
-          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50"></div>
+        <div class="card dark:bg-gray-800 relative overflow-hidden border-0 dark:border dark:border-gray-700 shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 sm:col-span-2 xl:col-span-1 p-4 sm:p-5">
+          <div class="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900 dark:to-orange-900 rounded-full -mr-12 -mt-12 sm:-mr-16 sm:-mt-16 opacity-50 dark:opacity-30"></div>
           <div class="relative flex items-center justify-between">
             <div class="flex-1 min-w-0 pr-2">
-              <p class="text-gray-500 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Úspory v cílech</p>
-              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mt-1 truncate text-gray-900">
+              <p class="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wider truncate">Úspory v cílech</p>
+              <p class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold mt-1 truncate text-gray-900 dark:text-white">
                 {{ formatCurrency(totalSavings) }}
               </p>
               <div class="mt-3">
                 <div class="flex justify-between items-center mb-1">
-                  <span class="text-xs text-gray-500">Progress cílů</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">Progress cílů</span>
                   <span class="text-xs font-semibold" 
-                        :class="savingsRate >= 75 ? 'text-emerald-600' : savingsRate >= 50 ? 'text-amber-600' : 'text-red-600'">
+                        :class="savingsRate >= 75 ? 'text-emerald-600 dark:text-emerald-400' : savingsRate >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'">
                     {{ isNaN(savingsRate) ? '0.0' : savingsRate.toFixed(1) }}%
                   </span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div class="h-2 rounded-full transition-all duration-500 ease-out"
                        :class="savingsRate >= 75 ? 'bg-gradient-to-r from-emerald-400 to-teal-400' : 
                                savingsRate >= 50 ? 'bg-gradient-to-r from-amber-400 to-orange-400' : 
@@ -109,7 +109,7 @@
                 </div>
               </div>
             </div>
-            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-500 to-orange-500 dark:from-amber-600 dark:to-orange-600 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg dark:shadow-amber-900/50">
               <PiggyBank class="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
             </div>
           </div>
@@ -119,24 +119,24 @@
       <!-- Graf příjmů a výdajů -->
       <div class="w-full">
         <!-- Měsíční trend -->
-        <div class="card">
+        <div class="card dark:bg-gray-800">
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Příjmy vs Výdaje</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Příjmy vs Výdaje</h3>
             <div class="flex items-center gap-2 sm:gap-3">
               <div class="hidden xs:flex items-center gap-2 sm:gap-4 mr-2 sm:mr-4">
                 <div class="flex items-center gap-1 sm:gap-2">
                   <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></div>
-                  <span class="text-xs sm:text-sm text-gray-600">Příjmy</span>
+                  <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Příjmy</span>
                 </div>
                 <div class="flex items-center gap-1 sm:gap-2">
                   <div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500"></div>
-                  <span class="text-xs sm:text-sm text-gray-600">Výdaje</span>
+                  <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Výdaje</span>
                 </div>
               </div>
               <select 
                 v-model="trendPeriod" 
                 @change="updateTrendData" 
-                class="text-xs sm:text-sm border border-gray-300 rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="text-xs sm:text-sm border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200"
               >
                 <option value="3">3 měsíce</option>
                 <option value="6">6 měsíců</option>
@@ -146,9 +146,9 @@
           </div>
           <div class="h-64 sm:h-80">
             <LineChart v-if="trendChartData && trendChartData.labels.length > 0" :data="trendChartData" :key="chartKey" />
-            <div v-else class="h-full flex items-center justify-center text-gray-500">
+            <div v-else class="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
               <div class="text-center">
-                <TrendingUp class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                <TrendingUp class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                 <p class="text-sm">Zatím žádná data</p>
                 <p class="text-xs mt-1">Graf se zobrazí po přidání transakcí</p>
               </div>
@@ -160,19 +160,19 @@
       <!-- Rozpočty a cíle -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5">
         <!-- Rozpočty -->
-        <div class="card p-4 sm:p-5">
+        <div class="card dark:bg-gray-800 p-4 sm:p-5">
           <div class="flex items-center justify-between mb-3 sm:mb-4">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900">Rozpočty</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Rozpočty</h3>
             <button
               @click="openBudgetSettings"
-              class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+              class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium flex items-center gap-1 transition-colors"
             >
               <Settings class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span class="hidden sm:inline">Upravit</span>
             </button>
           </div>
-          <div v-if="financeStore.budgets.length === 0" class="text-center py-8 text-gray-500">
-            <Calculator class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <div v-if="financeStore.budgets.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Calculator class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
             <p class="text-base">Zatím žádné rozpočty</p>
           </div>
           <div v-else class="space-y-3">
@@ -180,14 +180,14 @@
               <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
                   <CategoryIcon :category="budget.category" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                  <span class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ getCategoryName(budget.category) }}</span>
+                  <span class="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">{{ getCategoryName(budget.category) }}</span>
                 </div>
-                <span class="text-sm text-gray-600">
+                <span class="text-sm text-gray-600 dark:text-gray-400">
                   {{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}
                 </span>
               </div>
               <div class="flex items-center gap-1">
-                <div class="flex-1 bg-gray-200 rounded-full h-2 relative">
+                <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 relative">
                   <div
                     class="h-2 rounded-full transition-all duration-300"
                     :class="getBudgetBarClass(budget)"
@@ -212,45 +212,45 @@
         </div>
 
         <!-- Cíle -->
-        <div class="card">
+        <div class="card dark:bg-gray-800">
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-gray-900">Finanční cíle</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Finanční cíle</h3>
             <button
               @click="openGoalSettings"
-              class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
+              class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 font-medium flex items-center gap-1 transition-colors"
             >
               <Settings class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span class="hidden sm:inline">Upravit</span>
             </button>
           </div>
-          <div v-if="financeStore.goals.length === 0" class="text-center py-8 text-gray-500">
-            <Target class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <div v-if="financeStore.goals.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+            <Target class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
             <p class="text-base">Zatím žádné cíle</p>
           </div>
           <div v-else class="space-y-3">
-            <div v-for="goal in displayedGoals" :key="goal.id" class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
+            <div v-for="goal in displayedGoals" :key="goal.id" class="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg transition-all duration-300">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
                   <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
                     <component :is="getGoalIcon(goal.name)" class="w-4 h-4 text-white" />
                   </div>
-                  <span class="text-sm font-medium text-gray-900">{{ goal.name }}</span>
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">{{ goal.name }}</span>
                 </div>
-                <span class="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">
+                <span class="text-xs px-2 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 rounded-full">
                   {{ daysUntilDeadline(goal.deadline) }} dní
                 </span>
               </div>
-              <div class="w-full bg-white rounded-full h-2 mb-1">
+              <div class="w-full bg-white dark:bg-gray-700 rounded-full h-2 mb-1">
                 <div
                   class="bg-gradient-to-r from-purple-500 to-indigo-500 h-2 rounded-full transition-all duration-300"
                   :style="{ width: `${Math.min((goal.current_amount / goal.target_amount) * 100, 100)}%` }"
                 ></div>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-600">
+                <span class="text-xs text-gray-600 dark:text-gray-400">
                   {{ formatCurrency(goal.current_amount) }} z {{ formatCurrency(goal.target_amount) }}
                 </span>
-                <span class="text-xs font-medium text-indigo-600">
+                <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">
                   {{ ((goal.current_amount / goal.target_amount) * 100).toFixed(0) }}%
                 </span>
               </div>
@@ -260,9 +260,9 @@
       </div>
 
       <!-- Poslední transakce -->
-      <div class="card p-4 sm:p-5">
+      <div class="card dark:bg-gray-800 p-4 sm:p-5">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h3 class="text-base sm:text-lg font-semibold text-gray-900">Poslední transakce</h3>
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Poslední transakce</h3>
           <button
             @click="showAddTransactionModal = true"
             class="text-xs sm:text-sm bg-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1"
@@ -271,8 +271,8 @@
             <span>Přidat</span>
           </button>
         </div>
-        <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-8 text-gray-500">
-          <Receipt class="w-12 h-12 mx-auto mb-2 text-gray-300" />
+        <div v-if="financeStore.recentTransactions.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Receipt class="w-12 h-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
           <p class="text-base">Zatím žádné transakce</p>
           <button
             @click="showAddTransactionModal = true"
@@ -286,7 +286,7 @@
             v-for="transaction in financeStore.recentTransactions.slice(0, 10)"
             :key="transaction.id"
             @click="openEditTransaction(transaction)"
-            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-all cursor-pointer group"
+            class="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer group"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <!-- Ikona kategorie -->
@@ -304,11 +304,11 @@
               
               <!-- Popis a kategorie -->
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-gray-900 truncate">{{ transaction.description }}</p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">{{ transaction.description }}</p>
                 <div class="flex items-center gap-2 mt-0.5">
-                  <span class="text-xs text-gray-500">{{ getTransactionCategoryName(transaction) }}</span>
-                  <span class="text-xs text-gray-400">•</span>
-                  <span class="text-xs text-gray-500">{{ formatRelativeDate(transaction.date) }}</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ getTransactionCategoryName(transaction) }}</span>
+                  <span class="text-xs text-gray-400 dark:text-gray-600">•</span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatRelativeDate(transaction.date) }}</span>
                 </div>
               </div>
             </div>
@@ -317,7 +317,7 @@
             <div class="text-right flex-shrink-0 ml-4">
               <p
                 class="text-base font-bold"
-                :class="transaction.type === 'income' ? 'text-emerald-600' : 'text-rose-600'"
+                :class="transaction.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'"
               >
                 {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
               </p>
@@ -343,31 +343,31 @@
     />
 
     <!-- Modal pro nastavení rozpočtů -->
-    <div v-if="showBudgetSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] flex flex-col">
-        <div class="p-6 border-b">
-          <h2 class="text-lg font-semibold text-gray-900">Vyberte rozpočty pro zobrazení</h2>
-          <p class="text-sm text-gray-500 mt-1">Zvolte, které rozpočty chcete vidět na dashboardu</p>
+    <div v-if="showBudgetSettings" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full max-h-[80vh] flex flex-col shadow-xl transition-all duration-300">
+        <div class="p-6 border-b dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Vyberte rozpočty pro zobrazení</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Zvolte, které rozpočty chcete vidět na dashboardu</p>
         </div>
         <div class="flex-1 overflow-y-auto p-6">
           <div class="space-y-3">
             <div 
               v-for="budget in financeStore.budgets" 
               :key="budget.id"
-              class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              class="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200"
               @click="toggleBudgetSelection(budget.id)"
             >
               <div class="flex items-center space-x-3">
                 <div 
-                  class="w-5 h-5 border-2 rounded flex items-center justify-center"
-                  :class="isBudgetSelected(budget.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'"
+                  class="w-5 h-5 border-2 rounded flex items-center justify-center transition-all duration-200"
+                  :class="isBudgetSelected(budget.id) ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' : 'border-gray-300 dark:border-gray-600'"
                 >
                   <Check v-if="isBudgetSelected(budget.id)" class="w-3 h-3 text-white" />
                 </div>
                 <CategoryIcon :category="budget.category" class="w-5 h-5" />
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ getCategoryName(budget.category) }}</p>
-                  <p class="text-xs text-gray-500">{{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ getCategoryName(budget.category) }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatCurrency(budget.spent || 0) }} / {{ formatCurrency(budget.amount) }}</p>
                 </div>
               </div>
               <span 
@@ -379,23 +379,23 @@
             </div>
           </div>
         </div>
-        <div class="p-6 border-t flex justify-between">
+        <div class="p-6 border-t dark:border-gray-700 flex justify-between">
           <button
             @click="selectAllBudgets"
-            class="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors duration-200"
           >
             Vybrat vše
           </button>
           <div class="flex gap-3">
             <button
               @click="showBudgetSettings = false"
-              class="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+              class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
             >
               Zrušit
             </button>
             <button
               @click="saveBudgetSettings"
-              class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 text-sm bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-200"
             >
               Uložit
             </button>
@@ -405,60 +405,60 @@
     </div>
     
     <!-- Modal pro nastavení cílů -->
-    <div v-if="showGoalSettings" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg max-w-md w-full max-h-[80vh] flex flex-col">
-        <div class="p-6 border-b">
-          <h2 class="text-lg font-semibold text-gray-900">Vyberte cíle pro zobrazení</h2>
-          <p class="text-sm text-gray-500 mt-1">Zvolte, které cíle chcete vidět na dashboardu</p>
+    <div v-if="showGoalSettings" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-gray-900 rounded-lg max-w-md w-full max-h-[80vh] flex flex-col shadow-xl transition-all duration-300">
+        <div class="p-6 border-b dark:border-gray-700">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Vyberte cíle pro zobrazení</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Zvolte, které cíle chcete vidět na dashboardu</p>
         </div>
         <div class="flex-1 overflow-y-auto p-6">
           <div class="space-y-3">
             <div 
               v-for="goal in financeStore.goals" 
               :key="goal.id"
-              class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              class="flex items-center justify-between p-3 border dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-all duration-200"
               @click="toggleGoalSelection(goal.id)"
             >
               <div class="flex items-center space-x-3">
                 <div 
-                  class="w-5 h-5 border-2 rounded flex items-center justify-center"
-                  :class="isGoalSelected(goal.id) ? 'bg-indigo-600 border-indigo-600' : 'border-gray-300'"
+                  class="w-5 h-5 border-2 rounded flex items-center justify-center transition-all duration-200"
+                  :class="isGoalSelected(goal.id) ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' : 'border-gray-300 dark:border-gray-600'"
                 >
                   <Check v-if="isGoalSelected(goal.id)" class="w-3 h-3 text-white" />
                 </div>
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 dark:from-purple-600 dark:to-indigo-600 flex items-center justify-center">
                   <component :is="getGoalIcon(goal.name)" class="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900">{{ goal.name }}</p>
-                  <p class="text-xs text-gray-500">{{ formatCurrency(goal.current_amount) }} / {{ formatCurrency(goal.target_amount) }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ goal.name }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatCurrency(goal.current_amount) }} / {{ formatCurrency(goal.target_amount) }}</p>
                 </div>
               </div>
               <span 
-                class="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-700"
+                class="text-xs px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300"
               >
                 {{ ((goal.current_amount / goal.target_amount) * 100).toFixed(0) }}%
               </span>
             </div>
           </div>
         </div>
-        <div class="p-6 border-t flex justify-between">
+        <div class="p-6 border-t dark:border-gray-700 flex justify-between">
           <button
             @click="selectAllGoals"
-            class="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium transition-colors duration-200"
           >
             Vybrat vše
           </button>
           <div class="flex gap-3">
             <button
               @click="showGoalSettings = false"
-              class="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+              class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-200"
             >
               Zrušit
             </button>
             <button
               @click="saveGoalSettings"
-              class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 text-sm bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-all duration-200"
             >
               Uložit
             </button>
@@ -1030,7 +1030,7 @@ onUnmounted(() => {
 
 <style scoped>
 .card {
-  @apply bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100;
+  @apply bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-sm dark:shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300;
 }
 
 /* Responzivní opravy pro různá rozlišení */

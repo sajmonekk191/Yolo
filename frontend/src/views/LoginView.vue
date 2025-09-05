@@ -1,6 +1,16 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-black transition-colors duration-300">
     <div class="max-w-md w-full space-y-8">
+      <!-- Dark Mode Toggle -->
+      <div class="absolute top-4 right-4">
+        <button
+          @click="toggleDarkMode"
+          class="p-3 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-md transition-all duration-200 group"
+        >
+          <Sun v-if="!isDarkMode" class="w-5 h-5 text-yellow-500 group-hover:rotate-180 transition-transform duration-500" />
+          <Moon v-else class="w-5 h-5 text-blue-400 group-hover:rotate-12 transition-transform duration-500" />
+        </button>
+      </div>
       <!-- Logo a nadpis -->
       <div class="text-center">
         <div class="flex justify-center mb-6">
@@ -8,20 +18,20 @@
             <TrendingUp class="w-8 h-8 text-white" />
           </div>
         </div>
-        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <h2 class="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
           Yolo Finance
         </h2>
-        <p class="mt-2 text-gray-600">
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
           {{ isLogin ? 'Přihlaste se do svého účtu' : 'Vytvořte si nový účet' }}
         </p>
       </div>
 
       <!-- Formulář -->
-      <div class="card">
+      <div class="card dark:bg-gray-800 dark:border-gray-700">
         <form @submit.prevent="handleSubmit" class="space-y-6">
           <!-- Jméno (pouze při registraci) -->
           <div v-if="!isLogin">
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Celé jméno
             </label>
             <div class="relative">
@@ -39,7 +49,7 @@
 
           <!-- Email -->
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Email
             </label>
             <div class="relative">
@@ -57,7 +67,7 @@
 
           <!-- Heslo -->
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Heslo
             </label>
             <div class="relative">
@@ -73,7 +83,7 @@
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
               >
                 <Eye v-if="!showPassword" class="w-5 h-5" />
                 <EyeOff v-else class="w-5 h-5" />
@@ -83,7 +93,7 @@
 
           <!-- Potvrzení hesla (pouze při registraci) -->
           <div v-if="!isLogin">
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Potvrzení hesla
             </label>
             <div class="relative">
@@ -100,18 +110,18 @@
           </div>
 
           <!-- Chybová zpráva -->
-          <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div v-if="error" class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
             <div class="flex items-center">
-              <AlertCircle class="w-5 h-5 text-red-500 mr-2" />
-              <span class="text-sm text-red-700">{{ error }}</span>
+              <AlertCircle class="w-5 h-5 text-red-500 dark:text-red-400 mr-2" />
+              <span class="text-sm text-red-700 dark:text-red-400">{{ error }}</span>
             </div>
           </div>
 
           <!-- Úspěšná zpráva -->
-          <div v-if="success" class="bg-green-50 border border-green-200 rounded-lg p-3">
+          <div v-if="success" class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
             <div class="flex items-center">
-              <CheckCircle class="w-5 h-5 text-green-500 mr-2" />
-              <span class="text-sm text-green-700">{{ success }}</span>
+              <CheckCircle class="w-5 h-5 text-green-500 dark:text-green-400 mr-2" />
+              <span class="text-sm text-green-700 dark:text-green-400">{{ success }}</span>
             </div>
           </div>
 
@@ -128,11 +138,11 @@
 
         <!-- Přepínání mezi přihlášením a registrací -->
         <div class="mt-6 text-center">
-          <p class="text-sm text-gray-600">
+          <p class="text-sm text-gray-600 dark:text-gray-400">
             {{ isLogin ? 'Nemáte účet?' : 'Už máte účet?' }}
             <button
               @click="toggleMode"
-              class="text-blue-600 hover:text-blue-500 font-medium ml-1"
+              class="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium ml-1 transition-colors duration-200"
             >
               {{ isLogin ? 'Registrujte se' : 'Přihlaste se' }}
             </button>
@@ -141,16 +151,16 @@
       </div>
 
       <!-- Demo přihlašovací údaje -->
-      <div class="card bg-blue-50 border-blue-200">
-        <h3 class="text-sm font-medium text-blue-900 mb-2">Demo přihlášení</h3>
-        <p class="text-sm text-blue-700 mb-3">Pro testování můžete použít:</p>
-        <div class="text-sm text-blue-700 space-y-1">
+      <div class="card bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+        <h3 class="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">Demo přihlášení</h3>
+        <p class="text-sm text-blue-700 dark:text-blue-400 mb-3">Pro testování můžete použít:</p>
+        <div class="text-sm text-blue-700 dark:text-blue-400 space-y-1">
           <p><span class="font-medium">Email:</span> demo@yolo-finance.cz</p>
           <p><span class="font-medium">Heslo:</span> demo123</p>
         </div>
         <button
           @click="fillDemoData"
-          class="mt-3 text-sm text-blue-600 hover:text-blue-500 underline"
+          class="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 underline transition-colors duration-200"
         >
           Vyplnit demo údaje
         </button>
@@ -160,9 +170,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useDarkMode } from '@/composables/useDarkMode'
 import {
   TrendingUp,
   User,
@@ -171,11 +182,16 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Sun,
+  Moon
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// Dark mode
+const { isDarkMode, toggleDarkMode, initDarkMode } = useDarkMode()
 
 const isLogin = ref(true)
 const showPassword = ref(false)
@@ -270,4 +286,9 @@ const handleSubmit = async () => {
     console.error('Chyba při autentizaci:', err)
   }
 }
+
+onMounted(() => {
+  // Inicializace dark mode
+  initDarkMode()
+})
 </script>

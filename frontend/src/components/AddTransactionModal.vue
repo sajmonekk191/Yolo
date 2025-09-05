@@ -5,10 +5,10 @@
       <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="$emit('close')"></div>
 
       <!-- Modal panel -->
-      <div class="inline-block w-full sm:max-w-md p-4 sm:p-6 sm:my-8 text-left align-bottom sm:align-middle transition-all transform bg-white shadow-xl rounded-t-2xl sm:rounded-xl safe-bottom">
+      <div class="inline-block w-full sm:max-w-md p-4 sm:p-6 sm:my-8 text-left align-bottom sm:align-middle transition-all transform bg-white dark:bg-gray-900 shadow-xl rounded-t-2xl sm:rounded-xl safe-bottom">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-base sm:text-lg font-semibold text-gray-900">Přidat transakci</h3>
-          <button @click="$emit('close')" class="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+          <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Přidat transakci</h3>
+          <button @click="$emit('close')" class="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg transition-colors duration-200">
             <X class="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
@@ -16,15 +16,15 @@
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <!-- Typ transakce -->
           <div>
-            <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Typ transakce</label>
+            <label class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Typ transakce</label>
             <div class="grid grid-cols-2 gap-2 sm:gap-3">
               <button
                 type="button"
                 @click="form.type = 'income'"
-                class="p-2.5 sm:p-3 rounded-lg border text-center transition-colors"
+                class="p-2.5 sm:p-3 rounded-lg border text-center transition-all duration-200"
                 :class="form.type === 'income' 
-                  ? 'border-green-500 bg-green-50 text-green-700' 
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
+                  ? 'border-green-500 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400' 
+                  : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
               >
                 <TrendingUp class="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" />
                 <span class="text-xs sm:text-sm font-medium">Příjem</span>
@@ -32,10 +32,10 @@
               <button
                 type="button"
                 @click="form.type = 'expense'"
-                class="p-2.5 sm:p-3 rounded-lg border text-center transition-colors"
+                class="p-2.5 sm:p-3 rounded-lg border text-center transition-all duration-200"
                 :class="form.type === 'expense' 
-                  ? 'border-red-500 bg-red-50 text-red-700' 
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'"
+                  ? 'border-red-500 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400' 
+                  : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'"
               >
                 <TrendingDown class="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1" />
                 <span class="text-xs sm:text-sm font-medium">Výdaj</span>
@@ -45,7 +45,7 @@
 
           <!-- Částka -->
           <div>
-            <label for="amount" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Částka (Kč)</label>
+            <label for="amount" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">Částka (Kč)</label>
             <input
               id="amount"
               v-model.number="form.amount"
@@ -61,7 +61,7 @@
 
           <!-- Popis -->
           <div>
-            <label for="description" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Popis</label>
+            <label for="description" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">Popis</label>
             <input
               id="description"
               v-model="form.description"
@@ -74,7 +74,7 @@
 
           <!-- Kategorie -->
           <div>
-            <label for="category" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Kategorie</label>
+            <label for="category" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">Kategorie</label>
             <select
               id="category"
               v-model="form.category_id"
@@ -94,7 +94,7 @@
 
           <!-- Datum -->
           <div>
-            <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5 sm:mb-2">Datum</label>
+            <label for="date" class="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">Datum</label>
             <input
               id="date"
               v-model="form.date"
@@ -105,10 +105,10 @@
           </div>
 
           <!-- Chybová zpráva -->
-          <div v-if="error" class="bg-red-50 border border-red-200 rounded-lg p-2.5 sm:p-3">
+          <div v-if="error" class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-2.5 sm:p-3">
             <div class="flex items-center">
               <AlertCircle class="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-2 flex-shrink-0" />
-              <span class="text-xs sm:text-sm text-red-700">{{ error }}</span>
+              <span class="text-xs sm:text-sm text-red-700 dark:text-red-400">{{ error }}</span>
             </div>
           </div>
 

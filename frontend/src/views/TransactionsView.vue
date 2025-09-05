@@ -3,8 +3,8 @@
     <!-- Nadpis a tlačítko pro přidání -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Transakce</h1>
-        <p class="text-sm sm:text-base text-gray-600">Správa příjmů a výdajů</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transakce</h1>
+        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400">Správa příjmů a výdajů</p>
       </div>
       <button
         @click="showAddModal = true"
@@ -16,7 +16,7 @@
     </div>
 
     <!-- Filtry a vyhledávání -->
-    <div class="card">
+    <div class="card dark:bg-gray-800">
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <!-- Vyhledávání -->
         <div class="relative sm:col-span-2 md:col-span-1">
@@ -60,45 +60,45 @@
 
     <!-- Statistiky transakcí -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-      <div class="card">
+      <div class="card dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <div class="flex-1 min-w-0">
-            <p class="text-xs sm:text-sm text-gray-600 font-medium">Celkové příjmy</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 truncate">{{ formatCurrency(totalIncome) }}</p>
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Celkové příjmy</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-green-600 dark:text-green-400 truncate">{{ formatCurrency(totalIncome) }}</p>
           </div>
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-            <TrendingUp class="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <TrendingUp class="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
           </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card dark:bg-gray-800">
         <div class="flex items-center justify-between">
           <div class="flex-1 min-w-0">
-            <p class="text-xs sm:text-sm text-gray-600 font-medium">Celkové výdaje</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-bold text-red-600 truncate">{{ formatCurrency(totalExpenses) }}</p>
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Celkové výdaje</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-red-600 dark:text-red-400 truncate">{{ formatCurrency(totalExpenses) }}</p>
           </div>
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-            <TrendingDown class="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <TrendingDown class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 dark:text-red-400" />
           </div>
         </div>
       </div>
 
-      <div class="card sm:col-span-2 md:col-span-1">
+      <div class="card dark:bg-gray-800 sm:col-span-2 md:col-span-1">
         <div class="flex items-center justify-between">
           <div class="flex-1 min-w-0">
-            <p class="text-xs sm:text-sm text-gray-600 font-medium">Celkový počet</p>
-            <p class="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">{{ filteredTransactions.length }}</p>
+            <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">Celkový počet</p>
+            <p class="text-lg sm:text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">{{ filteredTransactions.length }}</p>
           </div>
-          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
-            <Hash class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <Hash class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Seznam transakcí -->
-    <div class="card">
+    <div class="card dark:bg-gray-800">
       <!-- Loading stav -->
       <div v-if="financeStore.isTransactionsLoading" class="flex items-center justify-center py-12">
         <div class="loading-spinner"></div>
@@ -106,9 +106,9 @@
 
       <!-- Prázdný stav -->
       <div v-else-if="filteredTransactions.length === 0" class="text-center py-8 sm:py-12">
-        <ArrowUpDown class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300" />
-        <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2">Žádné transakce</h3>
-        <p class="text-sm sm:text-base text-gray-500 mb-4 px-4">
+        <ArrowUpDown class="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 text-gray-300 dark:text-gray-600" />
+        <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-white mb-2">Žádné transakce</h3>
+        <p class="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-4 px-4">
           {{ filters.search || filters.type || filters.category ? 'Žádné transakce nevyhovují zadaným filtrům.' : 'Zatím nemáte žádné transakce.' }}
         </p>
         <button
@@ -125,48 +125,48 @@
         <div
           v-for="transaction in paginatedTransactions"
           :key="transaction.id"
-          class="border rounded-lg p-3 hover:shadow-md transition-shadow"
+          class="border dark:border-gray-700 rounded-lg p-3 hover:shadow-md dark:hover:bg-gray-700 transition-all duration-200"
         >
           <div class="flex items-start justify-between mb-2">
             <div class="flex items-center space-x-2">
               <div
                 class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                :class="transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'"
+                :class="transaction.type === 'income' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'"
               >
                 <TrendingUp
                   v-if="transaction.type === 'income'"
-                  class="w-4 h-4 text-green-600"
+                  class="w-4 h-4 text-green-600 dark:text-green-400"
                 />
                 <TrendingDown
                   v-else
-                  class="w-4 h-4 text-red-600"
+                  class="w-4 h-4 text-red-600 dark:text-red-400"
                 />
               </div>
               <div class="flex-1 min-w-0">
-                <p class="font-medium text-gray-900 text-sm truncate">{{ transaction.description }}</p>
-                <p class="text-xs text-gray-500">{{ getCategoryName(transaction) }}</p>
+                <p class="font-medium text-gray-900 dark:text-white text-sm truncate">{{ transaction.description }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ getCategoryName(transaction) }}</p>
               </div>
             </div>
             <div class="flex items-center space-x-2">
               <button
                 @click="editTransaction(transaction)"
-                class="p-1.5 text-gray-400 hover:text-blue-600 rounded"
+                class="p-1.5 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors duration-200"
               >
                 <Edit2 class="w-4 h-4" />
               </button>
               <button
                 @click="deleteTransaction(transaction)"
-                class="p-1.5 text-gray-400 hover:text-red-600 rounded"
+                class="p-1.5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors duration-200"
               >
                 <Trash2 class="w-4 h-4" />
               </button>
             </div>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-xs text-gray-500">{{ formatDate(transaction.date) }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(transaction.date) }}</span>
             <span
               class="font-semibold text-sm"
-              :class="transaction.type === 'income' ? 'text-green-600' : 'text-red-600'"
+              :class="transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
             >
               {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
             </span>
@@ -178,48 +178,48 @@
       <div v-else class="overflow-x-auto">
         <table class="w-full">
           <thead>
-            <tr class="border-b border-gray-200">
-              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">Datum</th>
-              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">Popis</th>
-              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 hidden sm:table-cell">Kategorie</th>
-              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">Částka</th>
-              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900">Akce</th>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-200">Datum</th>
+              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-200">Popis</th>
+              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-200 hidden sm:table-cell">Kategorie</th>
+              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-200">Částka</th>
+              <th class="text-left py-3 px-3 sm:px-4 text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-200">Akce</th>
             </tr>
           </thead>
           <tbody>
             <tr
               v-for="transaction in paginatedTransactions"
               :key="transaction.id"
-              class="border-b border-gray-100 hover:bg-gray-50"
+              class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
             >
-              <td class="py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-gray-600">
+              <td class="py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 {{ formatDate(transaction.date) }}
               </td>
               <td class="py-2 sm:py-3 px-3 sm:px-4">
                 <div class="flex items-center space-x-2 sm:space-x-3">
                   <div
                     class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    :class="transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'"
+                    :class="transaction.type === 'income' ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'"
                   >
                     <TrendingUp
                       v-if="transaction.type === 'income'"
-                      class="w-3 h-3 sm:w-4 sm:h-4 text-green-600"
+                      class="w-3 h-3 sm:w-4 sm:h-4 text-green-600 dark:text-green-400"
                     />
                     <TrendingDown
                       v-else
-                      class="w-3 h-3 sm:w-4 sm:h-4 text-red-600"
+                      class="w-3 h-3 sm:w-4 sm:h-4 text-red-600 dark:text-red-400"
                     />
                   </div>
-                  <span class="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[150px] sm:max-w-none">{{ transaction.description }}</span>
+                  <span class="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate max-w-[150px] sm:max-w-none">{{ transaction.description }}</span>
                 </div>
               </td>
-              <td class="py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-gray-600 hidden sm:table-cell">
+              <td class="py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:table-cell">
                 {{ getCategoryName(transaction) }}
               </td>
               <td class="py-2 sm:py-3 px-3 sm:px-4">
                 <span
                   class="text-xs sm:text-sm font-semibold"
-                  :class="transaction.type === 'income' ? 'text-green-600' : 'text-red-600'"
+                  :class="transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                 >
                   {{ transaction.type === 'income' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
                 </span>
@@ -228,13 +228,13 @@
                 <div class="flex items-center space-x-1 sm:space-x-2">
                   <button
                     @click="editTransaction(transaction)"
-                    class="p-1 text-gray-400 hover:text-blue-600 rounded"
+                    class="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors duration-200"
                   >
                     <Edit2 class="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
                   <button
                     @click="deleteTransaction(transaction)"
-                    class="p-1 text-gray-400 hover:text-red-600 rounded"
+                    class="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded transition-colors duration-200"
                   >
                     <Trash2 class="w-3 h-3 sm:w-4 sm:h-4" />
                   </button>
@@ -246,8 +246,8 @@
       </div>
 
       <!-- Paginace -->
-      <div v-if="totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
-        <div class="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+      <div v-if="totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+        <div class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
           Zobrazeno {{ ((currentPage - 1) * pageSize) + 1 }} - {{ Math.min(currentPage * pageSize, filteredTransactions.length) }} z {{ filteredTransactions.length }}
         </div>
         <div class="flex items-center justify-center space-x-2">
@@ -258,7 +258,7 @@
           >
             Předchozí
           </button>
-          <span class="text-xs sm:text-sm text-gray-600 px-2">
+          <span class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 px-2">
             {{ currentPage }} z {{ totalPages }}
           </span>
           <button
